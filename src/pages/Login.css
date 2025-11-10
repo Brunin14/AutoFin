@@ -1,0 +1,172 @@
+/* Importação de fonte moderna (opcional, adicione no seu index.html ou aqui) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #10B981; /* Verde esmeralda (Crescimento/Dinheiro) */
+  --secondary-color: #059669; /* Verde mais escuro para hover */
+  --bg-color: #f0f4f8; /* Fundo levemente acinzentado */
+  --card-bg: #ffffff;
+  --text-color: #1f2937;
+  --link-color: #2563eb;
+  --error-bg: #fee2e2;
+  --error-text: #b91c1c;
+}
+
+/* Fundo geral da página */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Use min-height para melhor responsividade em telas pequenas */
+  background-color: var(--bg-color);
+  font-family: 'Inter', sans-serif;
+  padding: 20px; /* Adiciona padding para telas muito pequenas */
+  box-sizing: border-box;
+}
+
+/* Card principal */
+.login-card {
+  background-color: var(--card-bg);
+  padding: 3rem 2.5rem; /* Mais espaçamento interno */
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Sombra mais suave */
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 5px solid var(--primary-color); /* Toque de cor no topo */
+}
+
+.login-card:hover {
+  transform: none; /* Remove a translação no hover para um look mais clean */
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo/Título do App */
+.app-logo {
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: block;
+}
+
+/* Título */
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+}
+
+/* Formulário */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Aumenta o espaçamento entre os campos */
+}
+
+/* Campos */
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem; /* Tamanho menor e mais discreto */
+  font-weight: 500;
+  color: #4b5563; /* Cor mais suave */
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem 1rem; /* Mais padding para melhor toque */
+  border-radius: 8px;
+  border: 1px solid #e5e7eb; /* Borda mais clara */
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: var(--bg-color); /* Fundo do input levemente colorido */
+}
+
+.form-group input:focus {
+  border-color: var(--primary-color);
+  background-color: var(--card-bg);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); /* Sombra de foco com cor primária */
+}
+
+/* Mensagem de erro */
+.erro-msg {
+  background-color: var(--error-bg);
+  color: var(--error-text);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #fca5a5; /* Borda para demarcar o erro */
+  text-align: left;
+}
+
+/* Botão */
+.btn-login {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600; /* Mais peso */
+  font-size: 1.05rem;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); /* Sombra para destacar */
+}
+
+.btn-login:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px); /* Efeito mais interativo */
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-login:active {
+  transform: translateY(0);
+}
+
+/* Rodapé */
+.login-footer {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.link-recuperar {
+  color: var(--link-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.link-recuperar:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .login-card {
+    margin: 0;
+    padding: 2rem 1.5rem; /* Ajuste para telas muito pequenas */
+    border-radius: 0; /* Opcional: para ocupar a largura total em telas muito pequenas */
+    max-width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .login-container {
+      padding: 0;
+  }
+}

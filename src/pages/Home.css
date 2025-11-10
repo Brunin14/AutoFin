@@ -1,0 +1,422 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #10B981; /* Verde esmeralda */
+  --secondary-color: #059669; 
+  --bg-color: #f8fafc; /* Fundo bem claro */
+  --card-bg: #ffffff;
+  --text-color-dark: #1f2937;
+  --text-color-medium: #4b5563;
+  --border-color: #e5e7eb;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color-medium);
+}
+
+.home-container {
+    padding: 20px 40px;
+    max-width: 1200px; /* Limite a largura para melhor leitura em telas grandes */
+    margin: 0 auto;
+}
+
+/* --- Cabeçalho --- */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+
+.welcome-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-color-dark);
+}
+
+.user-name {
+    color: var(--primary-color);
+}
+
+.btn-logout {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color-medium);
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+/* --- Grid de Destaques (Highlights) --- */
+.highlights-grid {
+    display: grid;
+    /* Três colunas em desktop */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+/* --- Cards Gerais --- */
+.card {
+    background-color: var(--card-bg);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    min-height: 250px; /* Garante que os cards tenham altura suficiente */
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color-dark);
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+/* --- Lista de Gastos --- */
+.expense-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.expense-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto; /* Tag | Descrição | Valor */
+    align-items: center;
+    padding: 8px 0;
+    font-size: 0.95rem;
+    color: var(--text-color-medium);
+    border-bottom: 1px dashed #f3f4f6;
+}
+
+.expense-item:last-child {
+    border-bottom: none;
+}
+
+.expense-description {
+    font-weight: 500;
+    color: var(--text-color-dark);
+    text-align: left;
+}
+
+.expense-value {
+    font-weight: 700;
+    color: #b91c1c; /* Vermelho para despesas */
+    text-align: right;
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #9ca3af;
+}
+
+/* --- Tags de Categoria --- */
+.category-tag {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    margin-right: 10px;
+    white-space: nowrap; /* Evita quebra de linha */
+}
+
+/* Cores específicas para as tags (Ajuste conforme suas categorias) */
+.category-alimentação { background-color: #fef3c7; color: #f59e0b; }
+.category-educação { background-color: #dbeafe; color: #3b82f6; }
+.category-transporte { background-color: #fce7f3; color: #ec4899; }
+.category-lazer { background-color: #d1fae5; color: #059669; }
+.category-outros { background-color: #e5e7eb; color: #6b7280; }
+
+
+/* --- Card de Saldo Rápido --- */
+.quick-balance-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--card-bg);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.quick-balance-card .card-title {
+    color: var(--card-bg);
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.balance-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.balance-value.positive {
+    color: #ccfbf1; /* Cor mais clara para contraste */
+}
+
+.link-detail {
+    color: #ccfbf1;
+    font-size: 0.9rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.link-detail:hover {
+    opacity: 0.8;
+}
+
+/* --- Botão de Ação --- */
+.action-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-new-expense {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.btn-new-expense:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* --- Responsividade (Para que tudo fique "na cara") --- */
+@media (max-width: 900px) {
+    .highlights-grid {
+        /* Muda para duas colunas em tablets */
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 20px;
+    }
+    
+    /* O Saldo Rápido (terceiro card) ocupa duas colunas */
+    .highlights-grid > .quick-balance-card {
+        grid-column: span 2; 
+    }
+}
+
+@media (max-width: 600px) {
+    .home-container {
+        padding: 15px 15px;
+    }
+    
+    .home-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-logout {
+        align-self: flex-end; /* Mantém o botão Sair no canto */
+    }
+    
+    .welcome-title {
+        font-size: 1.5rem;
+    }
+    
+    .highlights-grid {
+        /* Uma coluna em celulares, garantindo visibilidade total */
+        grid-template-columns: 1fr; 
+    }
+    
+    .highlights-grid > .quick-balance-card {
+        grid-column: span 1; 
+    }
+
+    .balance-value {
+        font-size: 2rem;
+    }
+}
+
+/* src/pages/Home.css */
+
+/* ... (todos os seus estilos anteriores: .home-container, .highlights-grid, etc) ... */
+
+
+/* ==================================
+          CHART SECTION
+===================================== */
+
+.chart-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Duas colunas para os gráficos */
+  gap: 25px;
+  margin-top: 25px;
+}
+
+/* O .card já vem do seu CSS global (do Relatorio.css, etc)
+  Este estilo .chart-card é para garantir que ele funcione com ECharts
+*/
+.chart-card {
+  /* O .card já deve ter: background, border-radius, shadow, etc. */
+  padding: 20px;
+  /* ECharts precisa de um container com altura definida para renderizar */
+  min-height: 400px; 
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card .card-title {
+  /* Este estilo provavelmente já existe */
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* --- Responsividade para os gráficos --- */
+@media (max-width: 900px) {
+  .chart-section {
+      grid-template-columns: 1fr; /* Uma única coluna em tablets e celulares */
+  }
+}
+
+/* ==================================
+   NOVO: Filtro de Data
+===================================== */
+.date-filter-group {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden; 
+    border: 1px solid var(--border-color);
+    margin-bottom: 25px;
+    max-width: 400px; /* Limita a largura */
+}
+
+.date-filter-option {
+    flex: 1; 
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-left: 1px solid var(--border-color);
+    
+    background-color: var(--card-bg);
+    color: #4b5563; 
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 10px;
+}
+.date-filter-option:first-child {
+    border-left: none;
+}
+
+/* Efeito hover no botão não-selecionado */
+.date-filter-option:hover {
+    background-color: #f9fafb;
+}
+
+/* 🎯 ESTILO DO BOTÃO SELECIONADO */
+.date-filter-option.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 700;
+}
+
+/* ==================================
+   NOVO: Estilos do Date Picker (Calendário)
+===================================== */
+
+/* O botão que você clica */
+.date-picker-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color-dark);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 25px; /* Adiciona espaço abaixo do botão */
+}
+.date-picker-button:hover {
+  border-color: var(--primary-color);
+}
+.date-picker-button span {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* O 'popup' que abre */
+.date-picker-popover {
+  position: absolute;
+  z-index: 100;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+}
+
+/* Ações dentro do popup */
+.date-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 15px;
+  border-top: 1px solid var(--border-color);
+}
+.date-picker-actions button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.btn-apply-date {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+.btn-apply-date:hover {
+  background-color: var(--secondary-color);
+}
+.btn-clear-date {
+  background-color: var(--card-bg);
+  color: var(--text-color-dark);
+}
+.btn-clear-date:hover {
+  background-color: #f9fafb;
+}
+
+/* Importa o CSS padrão da biblioteca de calendário */
+@import 'react-day-picker/dist/style.css';

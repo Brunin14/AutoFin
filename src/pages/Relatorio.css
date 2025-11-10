@@ -1,0 +1,427 @@
+/* src/pages/Relatorio.css */
+
+/* Assume que :root (variáveis de cor) já estão carregados globalmente */
+
+.relatorio-container {
+    padding: 20px 40px;
+    max-width: 1200px; 
+    margin: 0 auto;
+}
+
+.relatorio-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color-dark);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* --- 1. Wrapper dos Cards de Configuração --- */
+.config-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+/* O .card já deve vir do seu CSS global, mas adicionamos transição */
+.card {
+    transition: all 0.3s ease;
+}
+
+.config-card h2 {
+    font-size: 1.2rem; /* Um pouco maior */
+    font-weight: 600;
+    color: var(--text-color-dark); /* Mais legível */
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* --- Estilos dos Inputs e Labels --- */
+.config-card .form-group {
+    margin-bottom: 15px;
+}
+
+.config-card label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color-dark);
+    margin-bottom: 5px;
+}
+
+.config-card input[type="text"],
+.config-card input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+/* 🎯 NOVO: Efeito de Foco nos Inputs */
+.config-card input[type="text"]:focus,
+.config-card input[type="date"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); /* Sombra suave da cor primária */
+}
+
+/* ==================================
+   🎯 MUDANÇA PRINCIPAL: Botões de Rádio
+===================================== */
+.salario-tipo-group {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden; /* Para o radius funcionar */
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.salario-tipo-option {
+    /* O label agora é o botão */
+    flex: 1; /* Ocupa 50% */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-left: 1px solid var(--border-color);
+}
+.salario-tipo-option:first-child {
+    border-left: none;
+}
+
+/* Oculta o input de rádio real */
+.salario-tipo-option input[type="radio"] {
+    display: none; 
+}
+
+/* O span é o que o usuário vê */
+.salario-tipo-option span {
+    display: block;
+    padding: 12px 10px;
+    background-color: var(--card-bg);
+    color: #4b5563; /* Cinza escuro */
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Efeito hover no botão não-selecionado */
+.salario-tipo-option:hover span {
+    background-color: #f9fafb;
+}
+
+/* 🎯 ESTILO DO BOTÃO SELECIONADO */
+.salario-tipo-option input[type="radio"]:checked + span {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 700;
+}
+/* ==================================
+   Fim da mudança dos Botões de Rádio
+===================================== */
+
+.salario-dividido-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* --- Botão Salvar --- */
+.save-button-wrapper {
+    grid-column: span 2; 
+    text-align: center;
+}
+
+.btn-save {
+    background-color: #3b82f6; /* Azul */
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 250px; 
+    /* 🎯 NOVO: Sombra sutil */
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+}
+
+.btn-save:hover {
+    background-color: #2563eb;
+    /* 🎯 NOVO: Efeito "levantar" */
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.35);
+}
+.btn-save:disabled {
+    background-color: #9ca3af;
+    box-shadow: none;
+    transform: none;
+}
+
+/* --- 2. Seção do Relatório (Embaixo) --- */
+.report-section h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color-dark);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.report-list {
+    margin-top: 20px;
+}
+
+.dia-grupo {
+    margin-bottom: 25px;
+}
+.dia-grupo:last-child {
+    margin-bottom: 0;
+}
+
+.dia-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    /* 🎯 NOVO: Fundo sutil no header do dia */
+    background-color: #f9fafb; 
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+}
+
+.dia-data {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-color-dark); /* Mudado do verde para escuro */
+}
+
+.dia-total {
+    font-size: 1.1rem;
+    font-weight: 600; /* Um pouco mais leve */
+    color: #b91c1c; 
+}
+
+.gasto-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.gasto-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    padding: 12px 5px; /* Mais padding vertical */
+    border-bottom: 1px dashed #f3f4f6;
+    border-radius: 6px;
+    transition: background-color 0.2s ease; /* 🎯 NOVO: Efeito hover */
+}
+.gasto-item:hover {
+    background-color: #fdfdfd;
+}
+
+.gasto-item:last-child {
+    border-bottom: none;
+}
+
+.gasto-desc {
+    color: var(--text-color-dark);
+}
+
+.gasto-cat-tag {
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-right: 8px;
+    font-size: 0.9rem;
+}
+
+.gasto-item-right {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+.gasto-valor {
+    font-weight: 600;
+    color: var(--text-color-dark);
+}
+
+/* 🎯 NOVO: Efeito de hover no botão de deletar */
+.btn-delete-gasto-relatorio {
+    background-color: #fef2f2; 
+    color: #b91c1c; 
+    border: 1px solid #fee2e2;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 3px;
+    
+    /* 🎯 NOVO: Fica sutil até o hover */
+    opacity: 0.3;
+    transform: scale(0.9);
+    transition: all 0.2s ease;
+}
+
+/* 🎯 NOVO: Aparece no hover do *item da lista* */
+.gasto-item:hover .btn-delete-gasto-relatorio {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.btn-delete-gasto-relatorio:hover {
+    background-color: #fee2e2;
+    transform: scale(1.1); /* Efeito de zoom no botão */
+}
+
+
+/* --- Mensagens de Feedback --- */
+.loading-data, .no-data {
+    text-align: center;
+    padding: 30px;
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+
+/* --- Responsividade --- */
+@media (max-width: 900px) {
+    .relatorio-container { padding: 20px 20px; }
+    .config-wrapper { grid-template-columns: 1fr; }
+    .save-button-wrapper { grid-column: span 1; }
+    .btn-save { width: 100%; }
+}
+
+@media (max-width: 600px) {
+    .salario-dividido-inputs { grid-template-columns: 1fr; }
+    .dia-header { flex-direction: column; align-items: flex-start; gap: 5px; }
+    .dia-data { font-size: 1.1rem; }
+    .dia-total { font-size: 1rem; }
+    .gasto-item-right { gap: 5px; }
+    .btn-delete-gasto-relatorio { width: 24px; height: 24px; font-size: 1rem; opacity: 1; transform: none; } /* Sempre visível no mobile */
+}
+
+/* ==================================
+   NOVO: Filtro de Data
+===================================== */
+.date-filter-group {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden; 
+    border: 1px solid var(--border-color);
+    margin-bottom: 25px;
+    max-width: 400px; /* Limita a largura */
+}
+
+.date-filter-option {
+    flex: 1; 
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-left: 1px solid var(--border-color);
+    
+    background-color: var(--card-bg);
+    color: #4b5563; 
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 10px;
+}
+.date-filter-option:first-child {
+    border-left: none;
+}
+
+/* Efeito hover no botão não-selecionado */
+.date-filter-option:hover {
+    background-color: #f9fafb;
+}
+
+/* 🎯 ESTILO DO BOTÃO SELECIONADO */
+.date-filter-option.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 700;
+}
+
+/* ==================================
+   NOVO: Estilos do Date Picker (Calendário)
+===================================== */
+
+/* O botão que você clica */
+.date-picker-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color-dark);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.date-picker-button:hover {
+  border-color: var(--primary-color);
+}
+.date-picker-button span {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* O 'popup' que abre */
+.date-picker-popover {
+  position: absolute;
+  z-index: 100;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+}
+
+/* Ações dentro do popup */
+.date-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 15px;
+  border-top: 1px solid var(--border-color);
+}
+.date-picker-actions button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.btn-apply-date {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+.btn-apply-date:hover {
+  background-color: var(--secondary-color);
+}
+.btn-clear-date {
+  background-color: var(--card-bg);
+  color: var(--text-color-dark);
+}
+.btn-clear-date:hover {
+  background-color: #f9fafb;
+}
+
+/* Importa o CSS padrão da biblioteca de calendário */
+@import 'react-day-picker/dist/style.css';

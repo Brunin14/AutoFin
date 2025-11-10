@@ -1,0 +1,227 @@
+/* Estilos para o novo Popup. */
+
+.notification-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; 
+}
+
+.notification-content {
+  background: var(--card-bg, #fff);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ==================================
+   🎯 NOVOS ÍCONES ANIMADOS
+===================================== */
+.icon-container {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Animação base (círculo aparecendo) */
+@keyframes scale-in {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+/* Animação base (elementos internos aparecendo) */
+@keyframes pop-in {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* 1. ÍCONE DE SUCESSO (Verde) */
+.icon-success {
+  width: 80px;
+  height: 80px;
+  border: 4px solid #A5DC86; /* Verde sucesso */
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: scale-in 0.3s ease-in-out;
+  position: relative;
+}
+/* O "V" (checkmark) é feito com two pseudo-elementos */
+.icon-success::before, .icon-success::after {
+  content: '';
+  display: block;
+  background-color: #A5DC86;
+  position: absolute;
+  border-radius: 3px;
+}
+.icon-success::before { /* "Pauzinho" esquerdo */
+  width: 5px;
+  height: 25px;
+  transform: rotate(-45deg);
+  top: 35px;
+  left: 20px;
+  animation: check-left 0.2s 0.3s ease-in-out forwards;
+  opacity: 0;
+}
+.icon-success::after { /* "Pauzinho" direito */
+  width: 5px;
+  height: 45px;
+  transform: rotate(45deg);
+  top: 18px;
+  left: 42px;
+  animation: check-right 0.2s 0.5s ease-in-out forwards;
+  opacity: 0;
+}
+/* Animações do checkmark */
+@keyframes check-left {
+  from { height: 0; opacity: 0; }
+  to { height: 25px; opacity: 1; }
+}
+@keyframes check-right {
+  from { height: 0; opacity: 0; }
+  to { height: 45px; opacity: 1; }
+}
+
+
+/* 2. ÍCONE DE CONFIRMAÇÃO (Laranja) */
+.icon-confirm {
+  width: 80px;
+  height: 80px;
+  border: 4px solid #F8BB86; /* Laranja/Amarelo de aviso */
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: scale-in 0.3s ease-in-out;
+  position: relative;
+}
+.excl-line { /* "Pauzinho" do ! */
+  display: block;
+  background-color: #F8BB86;
+  position: absolute;
+  width: 5px;
+  height: 35px;
+  top: 17px;
+  left: 33px;
+  border-radius: 3px;
+  animation: pop-in 0.3s 0.3s ease-in-out forwards;
+  opacity: 0;
+}
+.excl-dot { /* "Ponto" do ! */
+  display: block;
+  background-color: #F8BB86;
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  top: 58px;
+  left: 32px;
+  border-radius: 50%;
+  animation: pop-in 0.3s 0.4s ease-in-out forwards;
+  opacity: 0;
+}
+
+
+/* 3. ÍCONE DE ERRO (Vermelho) */
+.icon-error {
+  width: 80px;
+  height: 80px;
+  border: 4px solid #F27474; /* Vermelho erro */
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: scale-in 0.3s ease-in-out;
+  position: relative;
+}
+.x-line { /* Os dois "pauzinhos" do X */
+  display: block;
+  background-color: #F27474;
+  position: absolute;
+  width: 5px;
+  height: 47px;
+  top: 16px;
+  left: 37px;
+  border-radius: 3px;
+}
+.x-line-1 {
+  transform: rotate(45deg);
+  animation: pop-in 0.3s 0.3s ease-in-out forwards;
+  opacity: 0;
+}
+.x-line-2 {
+  transform: rotate(-45deg);
+  animation: pop-in 0.3s 0.4s ease-in-out forwards;
+  opacity: 0;
+}
+/* ==================================
+   FIM DOS ÍCONES ANIMADOS
+===================================== */
+
+
+.notification-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.title-success { color: var(--primary-color, #10B981); }
+.title-error { color: #b91c1c; }
+.title-confirm { color: var(--text-color-dark, #1f2937); }
+
+.notification-message {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 25px;
+}
+
+.notification-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-notification {
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  min-width: 100px;
+  transition: all 0.2s ease;
+}
+
+.btn-ok {
+  background-color: var(--primary-color, #10B981);
+  color: white;
+}
+.btn-ok:hover {
+  background-color: var(--secondary-color, #059669);
+}
+
+.btn-confirm {
+  background-color: #b91c1c; /* Vermelho para confirmação perigosa */
+  color: white;
+}
+.btn-confirm:hover {
+  background-color: #991b1b;
+}
+
+.btn-cancel {
+  background-color: #e5e7eb;
+  color: var(--text-color-dark, #1f2937);
+  border: 1px solid #d1d5db;
+}
+.btn-cancel:hover {
+  background-color: #d1d5db;
+}

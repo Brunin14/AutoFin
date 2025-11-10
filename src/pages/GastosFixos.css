@@ -1,0 +1,201 @@
+/* src/pages/GastosFixos.css */
+
+/* Assume que :root e .card estão globais */
+.gastos-fixos-container {
+    padding: 20px 40px;
+    max-width: 1200px; 
+    margin: 0 auto;
+}
+
+.gastos-fixos-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color-dark);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Layout dos formulários */
+.forms-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.form-card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.form-description {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 20px;
+    min-height: 40px; /* Alinha os cards */
+}
+
+/* Estilos dos campos (reutilizados) */
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color-dark);
+    margin-bottom: 5px;
+}
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.btn-save {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+.btn-save:hover {
+    background-color: var(--secondary-color);
+}
+.btn-save:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Seção da Lista (embaixo) */
+.list-section h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color-dark);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.gastos-fixos-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.gasto-fixo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5px;
+    border-bottom: 1px dashed #f3f4f6;
+}
+.gasto-fixo-item:last-child {
+    border-bottom: none;
+}
+
+.item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.item-desc {
+    font-weight: 600;
+    color: var(--text-color-dark);
+    min-width: 150px;
+}
+.item-valor {
+    font-weight: 700;
+    color: #b91c1c; /* Vermelho */
+}
+.item-cat-tag {
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.item-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.item-vencimento {
+    font-size: 0.9rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.btn-delete-fixo {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fee2e2;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-delete-fixo:hover {
+    background-color: #fee2e2;
+}
+
+/* Mensagens */
+.erro-msg {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+.no-data {
+    text-align: center;
+    padding: 30px;
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+    .forms-wrapper {
+        grid-template-columns: 1fr; /* Coluna única */
+    }
+    .form-description {
+        min-height: auto; /* Remove altura mínima */
+    }
+}
+
+@media (max-width: 600px) {
+    .gastos-fixos-container {
+        padding: 20px 20px;
+    }
+    .gasto-fixo-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .item-details {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .item-desc {
+        min-width: auto;
+    }
+}

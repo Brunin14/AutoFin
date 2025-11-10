@@ -1,0 +1,335 @@
+:root {
+  --primary-color: #10B981; 
+  --secondary-color: #059669; 
+  --bg-color: #f8fafc; 
+  --card-bg: #ffffff;
+  --text-color-dark: #1f2937;
+  --border-color: #e5e7eb;
+}
+
+/* Garante o padding do corpo (do Navbar.css) */
+body {
+    background-color: var(--bg-color);
+}
+
+.register-container {
+    padding: 20px 40px;
+    max-width: 1200px; 
+    margin: 0 auto;
+}
+
+.register-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color-dark);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Wrapper principal do formulário, usando grid */
+.form-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas em telas grandes */
+    gap: 25px;
+}
+
+/* Estilo para os cards de seção */
+.card {
+    background-color: var(--card-bg);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* --- 1. Seção de Categoria --- */
+.category-section {
+    grid-column: span 2; /* Ocupa as duas colunas */
+    display: flex;
+    flex-direction: column;
+}
+
+.category-select-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.category-select {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+}
+
+.btn-add-category {
+    background-color: #3b82f6; /* Azul para destaque */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-add-category:hover {
+    background-color: #2563eb;
+}
+
+.selected-category-display {
+    margin-top: 10px;
+    font-size: 1rem;
+    padding: 10px;
+    background-color: #e0f2f1;
+    border-radius: 8px;
+    color: var(--secondary-color);
+}
+
+/* --- 2. Formulário de Gasto --- */
+.expense-form {
+    grid-column: 1 / 2; /* Ocupa a primeira coluna */
+}
+
+.expense-form .form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.expense-form label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color-dark);
+    margin-bottom: 5px;
+}
+
+.expense-form input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.btn-register {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 12px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-register:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-1px);
+}
+
+
+/* --- 3. Visualização Recente --- */
+.recent-expenses-section {
+    grid-column: 2 / 3; /* Ocupa a segunda coluna */
+}
+
+.expense-list-preview {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.expense-preview-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed #f3f4f6;
+    font-size: 0.95rem;
+    color: var(--text-color-dark);
+}
+
+.expense-preview-item:last-child {
+    border-bottom: none;
+}
+
+.preview-cat-tag {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-right: 5px;
+}
+
+.preview-value {
+    font-weight: 700;
+}
+
+.negative-value {
+    color: #b91c1c; 
+}
+
+
+/* ==================================
+             MODAL STYLES
+===================================== */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1010; /* Acima da navbar */
+}
+
+.modal-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+}
+
+.modal-content h3 {
+    color: var(--text-color-dark);
+    margin-bottom: 20px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.btn-modal-primary, .btn-modal-secondary {
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    flex-grow: 1;
+}
+
+.btn-modal-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.btn-modal-secondary {
+    background-color: #e5e7eb;
+    color: var(--text-color-dark);
+    border: 1px solid #d1d5db;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 900px) {
+    .register-container {
+        padding: 20px 20px;
+    }
+
+    .form-wrapper {
+        grid-template-columns: 1fr; /* Uma única coluna em tablets e celulares */
+    }
+
+    .category-section, .expense-form, .recent-expenses-section {
+        grid-column: span 1; /* Ocupa a única coluna */
+    }
+    
+    .category-section {
+        order: 1; /* Categoria primeiro */
+    }
+    .expense-form {
+        order: 2; /* Formulário em segundo */
+    }
+    .recent-expenses-section {
+        order: 3; /* Histórico por último */
+    }
+}
+
+/* ==================================
+   Estilos do Botão Deletar (Histórico)
+===================================== */
+
+/* 1. Atualiza o item da lista para alinhar o botão */
+.expense-preview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* <-- Importante: Alinha o botão verticalmente */
+    padding: 10px 0;
+    border-bottom: 1px dashed #f3f4f6;
+    font-size: 0.95rem;
+}
+
+/* 2. O novo <div> que agrupa o valor, data e botão */
+.preview-details-right {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaçamento entre valor, data e botão */
+}
+
+/* 3. Estilo principal do botão de deletar */
+.btn-delete-gasto {
+    background-color: #fef2f2; /* Vermelho bem claro */
+    color: #b91c1c; /* Vermelho escuro */
+    border: 1px solid #fee2e2;
+    border-radius: 50%; /* Faz ser um círculo */
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 3px; /* Ajuste para o 'x' ficar no centro */
+    transition: all 0.2s ease;
+}
+
+/* 4. Efeito hover */
+.btn-delete-gasto:hover {
+    background-color: #fee2e2; /* Vermelho um pouco mais forte */
+    color: #991b1b;
+    transform: scale(1.1); /* Efeito de leve zoom */
+}
+
+
+/* --- Responsividade --- */
+@media (max-width: 600px) {
+    .preview-details-right {
+       gap: 5px; /* Diminui o espaçamento em telas menores */
+    }
+
+    .btn-delete-gasto {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+    }
+}
