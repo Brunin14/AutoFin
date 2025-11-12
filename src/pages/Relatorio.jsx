@@ -23,6 +23,7 @@ const getCurrencyValues = (value) => {
     return { valorPuro: numericValue, valorExibicao: formattedDisplay };
 };
 const toISO_YYYY_MM_DD = (date) => {
+  if (!date) return null;
   return date.toISOString().slice(0, 10);
 };
 const parseLocalYMD = (s) => {
@@ -31,35 +32,42 @@ const parseLocalYMD = (s) => {
   return new Date(y, m - 1, d);
 };
 const formatDateForButton = (date) => {
+    if (!date) return "Selecione...";
     return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
 };
 // ======================================================================
 
 
-// 1. Recebe 'showNotification'
 function Relatorio({ onLogout, user, showNotification }) {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState(''); // Erro do formulário
 
-  // Estados de Configuração (Salário e Meta)
+  // --- Estados de Configuração (Salário) ---
   const [salarioTipo, setSalarioTipo] = useState('inteiro');
   const [salarioInteiro, setSalarioInteiro] = useState(0);
   const [salarioDia15, setSalarioDia15] = useState(0);
   const [salarioDia30, setSalarioDia30] = useState(0);
-  const [metaRecebimento, setMetaRecebimento] = useState(0);
   const [displaySalarioInteiro, setDisplaySalarioInteiro] = useState('');
   const [displaySalarioDia15, setDisplaySalarioDia15] = useState('');
   const [displaySalarioDia30, setDisplaySalarioDia30] = useState('');
-  const [displayMeta, setDisplayMeta] = useState('');
 
-  // Estados do Relatório de Gastos
+  // --- Estados do Relatório de Gastos ---
   const [gastosPorDia, setGastosPorDia] = useState([]);
   const [loadingGastos, setLoadingGastos] = useState(true);
   
-  // Estados para o filtro de data
+  // --- Estados das Rendas Fixas ---
+  const [rendasFixas, setRendasFixas] = useState([]);
+  const [loadingRendas, setLoadingRendas] = useState(true);
+  const [novaRendaForm, setNovaRendaForm] = useState({
+      nome: '',
+      valorPuro: 0,
+      valorExibicao: '',
+      diaRecebimento: 1,
+  });
+
+  // --- Estados do Filtro de Data ---
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef(null);
-  
   const [startDate, setStartDate] = useState(() => {
       const today = new Date();
       return toISO_YYYY_MM_DD(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -68,40 +76,48 @@ function Relatorio({ onLogout, user, showNotification }) {
       const today = new Date();
       return toISO_YYYY_MM_DD(new Date(today.getFullYear(), today.getMonth() + 1, 0));
   });
-  
   const [selectedRange, setSelectedRange] = useState({
       from: parseLocalYMD(startDate),
       to: parseLocalYMD(endDate),
   });
 
   
-  // 1. CARREGA AS CONFIGURAÇÕES (Salário/Meta)
+  // 1. CARREGA AS CONFIGURAÇÕES (Salário e Rendas Fixas)
   useEffect(() => {
     const carregarConfiguracoes = async () => {
         if (!user?._id) return;
         setLoading(true);
+        setLoadingRendas(true);
         try {
-            const response = await fetch(`https://autofin-backend.onrender.com/user/${user._id}/config`);
-            if (!response.ok) throw new Error("Falha ao carregar configurações.");
+            // Busca salário e rendas em paralelo
+            const [salarioResponse, rendasResponse] = await Promise.all([
+                fetch(`http://localhost:3001/user/${user._id}/config`, { headers: { 'X-User-ID': user._id } }),
+                fetch(`http://localhost:3001/renda-fixa`, { headers: { 'X-User-ID': user._id } })
+            ]);
+
+            if (!salarioResponse.ok) throw new Error("Falha ao carregar configurações de salário.");
+            if (!rendasResponse.ok) throw new Error("Falha ao carregar rendas fixas.");
+
+            const salarioData = await salarioResponse.json();
+            const rendasData = await rendasResponse.json();
             
-            const data = await response.json();
+            // Popula Salário
+            setSalarioTipo(salarioData.salarioTipo);
+            setSalarioInteiro(salarioData.salarioInteiro);
+            setSalarioDia15(salarioData.salarioDia15);
+            setSalarioDia30(salarioData.salarioDia30);
+            setDisplaySalarioInteiro(salarioData.salarioInteiro > 0 ? formatCurrencyForDisplay(salarioData.salarioInteiro) : '');
+            setDisplaySalarioDia15(salarioData.salarioDia15 > 0 ? formatCurrencyForDisplay(salarioData.salarioDia15) : '');
+            setDisplaySalarioDia30(salarioData.salarioDia30 > 0 ? formatCurrencyForDisplay(salarioData.salarioDia30) : '');
             
-            setSalarioTipo(data.salarioTipo);
-            setSalarioInteiro(data.salarioInteiro);
-            setSalarioDia15(data.salarioDia15);
-            setSalarioDia30(data.salarioDia30);
-            setMetaRecebimento(data.metaRecebimento);
-            
-            setDisplaySalarioInteiro(data.salarioInteiro > 0 ? formatCurrencyForDisplay(data.salarioInteiro) : '');
-            setDisplaySalarioDia15(data.salarioDia15 > 0 ? formatCurrencyForDisplay(data.salarioDia15) : '');
-            setDisplaySalarioDia30(data.salarioDia30 > 0 ? formatCurrencyForDisplay(data.salarioDia30) : '');
-            setDisplayMeta(data.metaRecebimento > 0 ? formatCurrencyForDisplay(data.metaRecebimento) : '');
-            
+            // Popula Rendas Fixas
+            setRendasFixas(rendasData);
+
         } catch (err) {
-            console.error(err);
-            setErro("Erro ao carregar suas configurações.");
+            setErro("Erro ao carregar suas configurações: " + err.message);
         } finally {
             setLoading(false);
+            setLoadingRendas(false);
         }
     };
     carregarConfiguracoes();
@@ -111,25 +127,17 @@ function Relatorio({ onLogout, user, showNotification }) {
   useEffect(() => {
     const carregarGastos = async () => {
       if (!user?._id) return;
-      
       setLoadingGastos(true);
       try {
         const urlParams = `?startDate=${startDate}&endDate=${endDate}`;
-        
-        const response = await fetch(`https://autofin-backend.onrender.com/gasto/relatorio-diario${urlParams}`, {
+        const response = await fetch(`http://localhost:3001/gasto/relatorio-diario${urlParams}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-User-ID': user._id, 
-            },
+            headers: { 'Content-Type': 'application/json', 'X-User-ID': user._id },
         });
         if (!response.ok) throw new Error("Falha ao carregar relatório de gastos.");
-        
         const data = await response.json();
         setGastosPorDia(data);
-        
       } catch (err) {
-        // Não usamos showNotification aqui para não poluir
         setErro("Erro ao carregar seu histórico de gastos.");
       } finally {
         setLoadingGastos(false);
@@ -146,17 +154,15 @@ function Relatorio({ onLogout, user, showNotification }) {
         }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [datePickerRef]);
 
 
-  // 3. FUNÇÃO PARA SALVAR as configurações (usa 'showNotification')
+  // 3. FUNÇÃO PARA SALVAR as configurações de SALÁRIO
   const handleSaveConfig = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setErro(''); // Limpa erros de formulário
+    setErro(''); 
     
     if (!user?._id) {
          showNotification("Erro: ID do usuário não encontrado.", "error");
@@ -169,11 +175,10 @@ function Relatorio({ onLogout, user, showNotification }) {
         salarioInteiro: salarioInteiro,
         salarioDia15: salarioDia15,
         salarioDia30: salarioDia30,
-        metaRecebimento: metaRecebimento
     };
     
     try {
-        const response = await fetch(`https://autofin-backend.onrender.com/user/config`, {
+        const response = await fetch(`http://localhost:3001/user/config`, {
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(configPayload)
@@ -181,42 +186,95 @@ function Relatorio({ onLogout, user, showNotification }) {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Erro do servidor");
         
-        showNotification("Configurações salvas com sucesso!", "success");
-
+        showNotification("Salário salvo com sucesso!", "success");
     } catch (err) {
-        showNotification(err.message || "Erro ao salvar configurações.", "error");
+        showNotification(err.message || "Erro ao salvar salário.", "error");
     } finally {
         setLoading(false);
     }
   };
-  
-  // 4. FUNÇÃO PARA DELETAR GASTO (usa 'showNotification')
-  const handleDeleteExpense = async (gastoId) => {
-      if (!user?._id || !gastoId) {
-          showNotification("ID de usuário ou gasto inválido.", "error");
+
+  // 4. FUNÇÃO PARA SALVAR a nova RENDA FIXA
+  const handleSaveRendaFixa = async (e) => {
+      e.preventDefault();
+      setErro('');
+      if (novaRendaForm.valorPuro <= 0 || !novaRendaForm.nome.trim()) {
+          setErro("Preencha o nome e o valor da renda.");
           return;
       }
 
-      // 1. Mostra a confirmação
+      const payload = {
+          userId: user._id,
+          nome: novaRendaForm.nome.trim(),
+          valor: novaRendaForm.valorPuro,
+          diaRecebimento: novaRendaForm.diaRecebimento,
+      };
+
+      setLoadingRendas(true);
+      try {
+          const response = await fetch('http://localhost:3001/renda-fixa', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'X-User-ID': user._id },
+              body: JSON.stringify(payload)
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || "Erro ao salvar.");
+
+          setRendasFixas([...rendasFixas, data.rendaFixa]);
+          setNovaRendaForm({ nome: '', valorPuro: 0, valorExibicao: '', diaRecebimento: 1 });
+          showNotification("Renda fixa salva!", "success");
+
+      } catch (err) {
+          showNotification(err.message, "error");
+      } finally {
+          setLoadingRendas(false);
+      }
+  };
+
+  // 5. FUNÇÃO PARA DELETAR RENDA FIXA
+  const handleDeleteRendaFixa = (rendaId) => {
+      if (!user?._id) return;
+      showNotification(
+          "Tem certeza que quer deletar esta renda?",
+          "confirm",
+          async () => {
+              setLoadingRendas(true);
+              try {
+                  const response = await fetch(`http://localhost:3001/renda-fixa/${rendaId}`, {
+                      method: 'DELETE',
+                      headers: { 'X-User-ID': user._id }
+                  });
+                  const data = await response.json();
+                  if (!response.ok) throw new Error(data.message || "Erro ao deletar.");
+
+                  setRendasFixas(rendasFixas.filter(r => r._id !== rendaId));
+                  showNotification("Renda deletada.", "success");
+              } catch (err) {
+                  showNotification(err.message, "error");
+              } finally {
+                  setLoadingRendas(false);
+              }
+          }
+      );
+  };
+  
+  // 6. FUNÇÃO PARA DELETAR GASTO (da lista)
+  const handleDeleteExpense = (gastoId) => {
+      if (!user?._id) return;
       showNotification(
         "Tem certeza que deseja excluir este gasto?",
         "confirm",
-        async () => { // 2. O que fazer se o usuário clicar "Sim"
+        async () => {
             setLoadingGastos(true);
-            setErro('');
             try {
-                const response = await fetch(`https://autofin-backend.onrender.com/gasto/${gastoId}`, {
+                const response = await fetch(`http://localhost:3001/gasto/${gastoId}`, {
                     method: 'DELETE',
                     headers: { 'X-User-ID': user._id },
                 });
                 const data = await response.json();
-                if (!response.ok || !data.success) {
-                    throw new Error(data.message || "Falha ao deletar o gasto.");
-                }
+                if (!response.ok) throw new Error(data.message || "Falha ao deletar.");
 
-                showNotification("Gasto deletado com sucesso!", "success");
-
-                // Remove o item da lista localmente
+                showNotification("Gasto deletado!", "success");
                 setGastosPorDia(prevGrupos => {
                     const novosGrupos = prevGrupos.map(grupo => {
                         const gastoOriginal = grupo.gastos.find(g => g._id === gastoId);
@@ -227,7 +285,6 @@ function Relatorio({ onLogout, user, showNotification }) {
                     });
                     return novosGrupos.filter(grupo => grupo.gastos.length > 0);
                 });
-
             } catch (err) {
                 showNotification(err.message, "error");
             } finally {
@@ -242,7 +299,7 @@ function Relatorio({ onLogout, user, showNotification }) {
       if (selectedRange.from && selectedRange.to) {
           setStartDate(toISO_YYYY_MM_DD(selectedRange.from));
           setEndDate(toISO_YYYY_MM_DD(selectedRange.to));
-          setShowDatePicker(false); // Fecha o popup
+          setShowDatePicker(false);
       } else {
           showNotification("Por favor, selecione um período de início e fim.", "error");
       }
@@ -254,8 +311,7 @@ function Relatorio({ onLogout, user, showNotification }) {
       <Navbar onLogout={onLogout} />
       
       <div className="relatorio-container">
-        <h1 className="relatorio-title">Receita e Renda Extra</h1>
-
+        <h1 className="relatorio-title">Salário e Rendas</h1>
         {erro && <div className="erro-msg">{erro}</div>}
 
         {/* === 1. CARDS DE CONFIGURAÇÃO (TOPO) === */}
@@ -293,9 +349,7 @@ function Relatorio({ onLogout, user, showNotification }) {
               <div className="form-group">
                 <label htmlFor="salarioInteiro">Valor Total (R$)</label>
                 <input
-                  id="salarioInteiro"
-                  type="text"
-                  placeholder="R$ 3.000,00"
+                  id="salarioInteiro" type="text" placeholder="R$ 3.000,00"
                   value={displaySalarioInteiro}
                   onChange={(e) => {
                       const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
@@ -311,9 +365,7 @@ function Relatorio({ onLogout, user, showNotification }) {
                 <div className="form-group">
                   <label htmlFor="salarioDia15">Pagamento Dia 15 (R$)</label>
                   <input
-                    id="salarioDia15"
-                    type="text"
-                    placeholder="R$ 1.500,00"
+                    id="salarioDia15" type="text" placeholder="R$ 1.500,00"
                     value={displaySalarioDia15}
                     onChange={(e) => {
                       const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
@@ -325,9 +377,7 @@ function Relatorio({ onLogout, user, showNotification }) {
                 <div className="form-group">
                   <label htmlFor="salarioDia30">Pagamento Dia 30 (R$)</label>
                   <input
-                    id="salarioDia30"
-                    type="text"
-                    placeholder="R$ 1.500,00"
+                    id="salarioDia30" type="text" placeholder="R$ 1.500,00"
                     value={displaySalarioDia30}
                     onChange={(e) => {
                       const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
@@ -338,38 +388,71 @@ function Relatorio({ onLogout, user, showNotification }) {
                 </div>
               </div>
             )}
-          </div>
-          
-          {/* --- Card Meta --- */}
-          <div className="card config-card">
-            <h2>Renda Extra (Outros Recebimentos)</h2>
-             <div className="form-group">
-                <label htmlFor="meta">Valor da Renda Extra(R$)</label>
-                <input
-                  id="meta"
-                  type="text"
-                  placeholder="R$ 500,00"
-                  value={displayMeta}
-                  onChange={(e) => {
-                      const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
-                      setMetaRecebimento(valorPuro);
-                      setDisplayMeta(valorExibicao);
-                  }}
-                />
-              </div>
-          </div>
-          
-          {/* --- Botão Salvar (Centralizado) --- */}
-          <div className="save-button-wrapper">
-             <button type="submit" className="btn-save" disabled={loading}>
-                {loading ? "Salvando..." : "Salvar Configurações"}
+            
+            {/* Botão de Salvar Salário */}
+            <button type="submit" className="btn-save" disabled={loading}>
+              {loading ? "Salvando..." : "Salvar Salário"}
             </button>
           </div>
+          
+          {/* --- Card Rendas Fixas (Novo) --- */}
+          <div className="card config-card">
+            <h2>Rendas Fixas Recorrentes</h2>
+            
+            {/* Lista de Rendas Fixas */}
+            <div className="renda-fixa-list">
+                {loadingRendas && <p>Carregando rendas...</p>}
+                {!loadingRendas && rendasFixas.length === 0 && (
+                    <p className="no-data-small">Nenhuma renda fixa cadastrada.</p>
+                )}
+                {rendasFixas.map(renda => (
+                    <div key={renda._id} className="renda-fixa-item">
+                        <span>{renda.nome} (Todo dia {renda.diaRecebimento})</span>
+                        <span>{formatCurrencyForDisplay(renda.valor)}</span>
+                        <button 
+                            className="btn-delete-fixo-renda" 
+                            onClick={() => handleDeleteRendaFixa(renda._id)}
+                        >
+                            &times;
+                        </button>
+                    </div>
+                ))}
+            </div>
+
+            {/* Formulário para adicionar nova renda */}
+            <form className="renda-fixa-form" onSubmit={handleSaveRendaFixa}>
+                <input
+                    type="text"
+                    placeholder="Nome da Renda (ex: Carros)"
+                    value={novaRendaForm.nome}
+                    onChange={(e) => setNovaRendaForm({...novaRendaForm, nome: e.target.value})}
+                />
+                <input
+                    type="text"
+                    placeholder="R$ 0,00"
+                    value={novaRendaForm.valorExibicao}
+                    onChange={(e) => {
+                      const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
+                      setNovaRendaForm({...novaRendaForm, valorPuro, valorExibicao});
+                    }}
+                />
+                <input
+                    type="number"
+                    min="1" max="31"
+                    value={novaRendaForm.diaRecebimento}
+                    onChange={(e) => setNovaRendaForm({...novaRendaForm, diaRecebimento: e.target.value})}
+                />
+                <button type="submit" className="btn-add-renda" disabled={loadingRendas}>
+                    +
+                </button>
+            </form>
+          </div>
+          
         </form>
 
         {/* === 2. RELATÓRIO DE GASTOS (EMBAIXO) === */}
         <div className="card report-section">
-          <h2>Gastos por Dia</h2>
+          <h2>Histórico de Gastos</h2>
           
           {/* Botão do Calendário */}
           <div style={{ position: 'relative' }} ref={datePickerRef}>
@@ -391,7 +474,7 @@ function Relatorio({ onLogout, user, showNotification }) {
                         selected={selectedRange}
                         onSelect={setSelectedRange}
                         defaultMonth={selectedRange.from || parseLocalYMD(startDate)}
-                        locale={ptBR} // Usa o idioma importado
+                        locale={ptBR}
                     />
                     <div className="date-picker-actions">
                         <button 
@@ -467,5 +550,11 @@ function Relatorio({ onLogout, user, showNotification }) {
     </>
   );
 }
+
+// (Funções auxiliares restantes)
+const carregarConfiguracoes = async () => {};
+const carregarGastos = async () => {};
+const handleSaveConfig = async () => {};
+const handleDeleteExpense = async () => {};
 
 export default Relatorio;
