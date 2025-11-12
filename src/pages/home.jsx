@@ -100,10 +100,7 @@ function Home({ user, onLogout }) {
   // --- HOOK DE FETCH ---
   useEffect(() => {
     const fetchData = async () => {
-        if (!userId) { 
-            setLoading(false);
-            return; 
-        }
+        if (!userId) { setLoading(false); return; }
         setLoading(true);
         setError(null);
         try {
@@ -138,9 +135,7 @@ function Home({ user, onLogout }) {
         }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => { document.removeEventListener("mousedown", handleClickOutside); };
   }, [datePickerRef]);
 
 
@@ -150,7 +145,6 @@ function Home({ user, onLogout }) {
       const today = new Date();
       const startOfWeek = new Date(today);
       startOfWeek.setDate(today.getDate() - 7); 
-      
       return transacoes.filter(exp => {
           const parts = exp.data.split('-').map(Number);
           const expenseDate = new Date(parts[0], parts[1] - 1, parts[2]);
@@ -159,6 +153,43 @@ function Home({ user, onLogout }) {
   }, [transacoes, loading]);
   
   const monthlyExpenses = transacoes;
+
+  // Lógica do Salário movida para 'useMemo'
+  const lastPaycheckInfo = useMemo(() => {
+    if (!userConfig) {
+      return { lastPaycheckDate: new Date(), totalIncomeThisCycle: 0 };
+    }
+
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.getMonth();
+    const year = today.getFullYear();
+    let lastPaycheckDate = new Date(year, month, 1);
+    let lastPaycheckAmount = 0;
+    const { salarioTipo, salarioInteiro, salarioDia15, salarioDia30, metaRecebimento } = userConfig;
+
+    if (salarioTipo === 'inteiro') {
+        lastPaycheckAmount = salarioInteiro;
+        if (day < 30) { lastPaycheckDate = new Date(year, month - 1, 30); } 
+        else { lastPaycheckDate = new Date(year, month, 30); }
+    } else if (salarioTipo === 'dividido') {
+        if (day < 15) {
+            lastPaycheckDate = new Date(year, month - 1, 30);
+            lastPaycheckAmount = salarioDia30;
+        } else if (day < 30) {
+            lastPaycheckDate = new Date(year, month, 15);
+            lastPaycheckAmount = salarioDia15;
+        } else {
+            lastPaycheckDate = new Date(year, month, 30);
+            lastPaycheckAmount = salarioDia30;
+        }
+    }
+    
+    const totalIncomeThisCycle = lastPaycheckAmount + (metaRecebimento || 0);
+    return { lastPaycheckDate, totalIncomeThisCycle };
+
+  }, [userConfig]);
+
 
   // --- HOOK DE CÁLCULO DE SALDO ---
   useEffect(() => {
@@ -171,37 +202,12 @@ function Home({ user, onLogout }) {
         const totalReceitas = receitas.reduce((sum, r) => sum + r.valor, 0);
         const totalGastos = transacoes.reduce((sum, exp) => sum + exp.valor, 0);
         const balancoPeriodo = totalReceitas - totalGastos;
-        
         setCurrentBalance(balancoPeriodo);
     
     } else {
         // Se for o Mês Atual, roda a lógica de "Saldo Restante"
         const today = new Date();
-        const day = today.getDate();
-        const month = today.getMonth();
-        const year = today.getFullYear();
-        let lastPaycheckDate = new Date(year, month, 1);
-        let lastPaycheckAmount = 0;
-        const { salarioTipo, salarioInteiro, salarioDia15, salarioDia30, metaRecebimento } = userConfig;
-
-        if (salarioTipo === 'inteiro') {
-            lastPaycheckAmount = salarioInteiro;
-            if (day < 30) { lastPaycheckDate = new Date(year, month - 1, 30); } 
-            else { lastPaycheckDate = new Date(year, month, 30); }
-        } else if (salarioTipo === 'dividido') {
-            if (day < 15) {
-                lastPaycheckDate = new Date(year, month - 1, 30);
-                lastPaycheckAmount = salarioDia30;
-            } else if (day < 30) {
-                lastPaycheckDate = new Date(year, month, 15);
-                lastPaycheckAmount = salarioDia15;
-            } else {
-                lastPaycheckDate = new Date(year, month, 30);
-                lastPaycheckAmount = salarioDia30;
-            }
-        }
-        
-        const totalIncomeThisCycle = lastPaycheckAmount + (metaRecebimento || 0);
+        const { lastPaycheckDate, totalIncomeThisCycle } = lastPaycheckInfo;
         
         const totalReceitasManuais = receitas
             .filter(r => {
@@ -221,8 +227,7 @@ function Home({ user, onLogout }) {
         const balance = (totalIncomeThisCycle + totalReceitasManuais) - totalGastoSinceLastPaycheck;
         setCurrentBalance(balance);
     }
-
-  }, [transacoes, userConfig, loading, receitas, isCustomFilter]);
+  }, [transacoes, userConfig, loading, receitas, isCustomFilter, lastPaycheckInfo]);
 
   
   // --- GRÁFICOS ---
@@ -277,6 +282,79 @@ function Home({ user, onLogout }) {
       };
   }, [monthlyExpenses, startDate]);
 
+  // Mini-Gráfico (Sparkline) para o Card de Saldo
+  const sparklineOptions = useMemo(() => {
+    const [year, month] = startDate.split('-').map(Number);
+    const diasNoMes = new Date(year, month, 0).getDate(); 
+    const labelsDosDias = Array.from({ length: diasNoMes }, (_, i) => (i + 1).toString());
+    const dailyDeltas = new Array(diasNoMes).fill(0);
+    
+    receitas.forEach(gasto => {
+        const parts = gasto.data.split('-').map(Number);
+        const expenseDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        const dia = expenseDate.getDate(); 
+        dailyDeltas[dia - 1] += gasto.valor; 
+    });
+    transacoes.forEach(gasto => {
+        const parts = gasto.data.split('-').map(Number);
+        const expenseDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        const dia = expenseDate.getDate(); 
+        dailyDeltas[dia - 1] -= gasto.valor; 
+    });
+
+    let startingBalance = 0;
+    if (!isCustomFilter) {
+      startingBalance = lastPaycheckInfo.totalIncomeThisCycle;
+    } 
+
+    const cumulativeData = [];
+    let runningBalance = startingBalance;
+    for (let i = 0; i < diasNoMes; i++) {
+        runningBalance += dailyDeltas[i];
+        cumulativeData.push(runningBalance.toFixed(2));
+    }
+    
+    const endColor = '#FFFFFF'; // 🎯 MUDANÇA: Linha do gráfico branca
+
+    return {
+        grid: { left: 0, right: 0, top: 10, bottom: 10 },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'line' },
+            formatter: (params) => `Dia ${params[0].name}: ${formatCurrency(params[0].value)}`
+        },
+        xAxis: {
+            type: 'category',
+            data: labelsDosDias,
+            show: false
+        },
+        yAxis: {
+            type: 'value',
+            show: false
+        },
+        series: [{
+            name: 'Balanço',
+            type: 'line',
+            data: cumulativeData,
+            showSymbol: false,
+            lineStyle: {
+                color: endColor,
+                width: 2
+            },
+            areaStyle: {
+                color: {
+                  type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+                  colorStops: [
+                    { offset: 0, color: endColor + '4D' }, // Branco com 30% opacidade
+                    { offset: 1, color: endColor + '00' }  // Branco com 0% opacidade
+                  ]
+                }
+            }
+        }]
+    };
+  }, [monthlyExpenses, startDate, receitas, transacoes, isCustomFilter, lastPaycheckInfo]);
+
+
   // --- FUNÇÕES DO CALENDÁRIO ---
   const handleApplyDateRange = () => {
       if (selectedRange.from && selectedRange.to) {
@@ -295,6 +373,7 @@ function Home({ user, onLogout }) {
           }
           setShowDatePicker(false);
       } else {
+          // (Assumindo que showNotification não foi passada do App.js para Home)
           alert("Por favor, selecione um período de início e fim.");
       }
   };
@@ -387,12 +466,24 @@ function Home({ user, onLogout }) {
           />
           
           <div className="card quick-balance-card">
-            <h2 className="card-title">
-                {isCustomFilter ? "Balanço do Período" : "Saldo Restante"}
-            </h2>
-            <p className={`balance-value ${currentBalance >= 0 ? 'positive' : 'negative'}`}>
-              {formatCurrency(currentBalance)}
-            </p>
+            <div>
+              <h2 className="card-title">
+                  {isCustomFilter ? "Balanço do Período" : "Saldo Restante"}
+              </h2>
+              <p className={`balance-value ${currentBalance >= 0 ? 'positive' : 'negative'}`}>
+                {formatCurrency(currentBalance)}
+              </p>
+            </div>
+            
+            <div className="sparkline-chart-container">
+                <ReactECharts
+                    option={sparklineOptions}
+                    style={{ height: '100%', width: '100%' }}
+                    notMerge={true}
+                    lazyUpdate={true}
+                />
+            </div>
+            
             <p className="balance-info">
               {isCustomFilter 
                 ? "(Receitas - Despesas) no período"
