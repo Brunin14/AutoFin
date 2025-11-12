@@ -200,3 +200,110 @@ body {
     }
 }
 
+/* ==================================
+   CSS para a Navbar (Navbar.css)
+   (Assume que :root com --primary-color, etc. está no index.css)
+===================================== */
+
+.app-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  background-color: #1f2937; /* Fundo escuro */
+  color: #f3f4f6;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 1. Logo e Título */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaço entre a logo e o texto */
+  cursor: pointer;
+}
+
+.navbar-logo {
+  height: 32px; /* Altura da logo */
+  width: auto;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* 2. Links de Navegação */
+.navbar-links {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espaço entre o ícone e o texto */
+  
+  color: #d1d5db; /* Cinza claro (não-ativo) */
+  background-color: transparent;
+  text-decoration: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 10px 15px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* O "verdinho" que você pediu */
+.nav-link.active {
+  background-color: var(--primary-color, #10B981); 
+  color: white;
+  font-weight: 600;
+}
+
+/* Botão de Ação (Registrar Gasto) */
+.nav-link.btn-action {
+  background-color: var(--primary-color, #10B981);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3);
+}
+
+.nav-link.btn-action:hover {
+  background-color: var(--secondary-color, #059669);
+}
+
+/* 3. Ações do Usuário */
+.navbar-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-greeting {
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.btn-logout-nav {
+  background-color: #4b5563;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-logout-nav:hover {
+  background-color: #6b7280;
+}
