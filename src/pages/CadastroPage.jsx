@@ -31,7 +31,7 @@ function CadastroPage({ onLogin }) { // Recebe onLogin para auto-login
 
     try {
       // 4. Chama a nova rota /register
-      const response = await fetch("http://localhost:3001/register", {
+      const response = await fetch("https://autofin-backend.onrender.com/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nome, email, senha }),

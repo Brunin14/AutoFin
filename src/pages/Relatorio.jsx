@@ -81,7 +81,7 @@ function Relatorio({ onLogout, user, showNotification }) {
         if (!user?._id) return;
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:3001/user/${user._id}/config`);
+            const response = await fetch(`https://autofin-backend.onrender.com/user/${user._id}/config`);
             if (!response.ok) throw new Error("Falha ao carregar configurações.");
             
             const data = await response.json();
@@ -116,7 +116,7 @@ function Relatorio({ onLogout, user, showNotification }) {
       try {
         const urlParams = `?startDate=${startDate}&endDate=${endDate}`;
         
-        const response = await fetch(`http://localhost:3001/gasto/relatorio-diario${urlParams}`, {
+        const response = await fetch(`https://autofin-backend.onrender.com/gasto/relatorio-diario${urlParams}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -173,7 +173,7 @@ function Relatorio({ onLogout, user, showNotification }) {
     };
     
     try {
-        const response = await fetch(`http://localhost:3001/user/config`, {
+        const response = await fetch(`https://autofin-backend.onrender.com/user/config`, {
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(configPayload)
@@ -205,7 +205,7 @@ function Relatorio({ onLogout, user, showNotification }) {
             setLoadingGastos(true);
             setErro('');
             try {
-                const response = await fetch(`http://localhost:3001/gasto/${gastoId}`, {
+                const response = await fetch(`https://autofin-backend.onrender.com/gasto/${gastoId}`, {
                     method: 'DELETE',
                     headers: { 'X-User-ID': user._id },
                 });

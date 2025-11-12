@@ -51,8 +51,8 @@ function GastosFixos({ onLogout, user, showNotification }) {
         setLoading(true);
         try {
             const [gastosResponse, catResponse] = await Promise.all([
-                fetch('http://localhost:3001/gasto-fixo', { headers: { 'X-User-ID': user._id } }),
-                fetch('http://localhost:3001/user/categories', { headers: { 'X-User-ID': user._id } })
+                fetch('https://autofin-backend.onrender.com/gasto-fixo', { headers: { 'X-User-ID': user._id } }),
+                fetch('https://autofin-backend.onrender.com/user/categories', { headers: { 'X-User-ID': user._id } })
             ]);
 
             if (!gastosResponse.ok) throw new Error("Falha ao buscar gastos fixos.");
@@ -121,7 +121,7 @@ function GastosFixos({ onLogout, user, showNotification }) {
   const saveGastoFixo = async (payload) => {
       setLoading(true);
       try {
-          const response = await fetch('http://localhost:3001/gasto-fixo', {
+          const response = await fetch('https://autofin-backend.onrender.com/gasto-fixo', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'X-User-ID': user._id },
               body: JSON.stringify(payload),
@@ -149,7 +149,7 @@ function GastosFixos({ onLogout, user, showNotification }) {
             setLoading(true);
             setErro('');
             try {
-                const response = await fetch(`http://localhost:3001/gasto-fixo/${gastoFixoId}`, {
+                const response = await fetch(`https://autofin-backend.onrender.com/gasto-fixo/${gastoFixoId}`, {
                     method: 'DELETE',
                     headers: { 'X-User-ID': user._id }
                 });

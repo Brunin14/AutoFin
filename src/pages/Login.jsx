@@ -42,7 +42,7 @@ function LoginPage({ onLogin }) {
         
         {/* Logo/Ícone do App */}
         <div className="app-logo">
-          <span className="logo-text">Controle.App</span>
+          <span className="logo-text">AutoFin</span>
         </div>
         
         <h1 className="login-title">Acesso à sua Organização Financeira</h1>

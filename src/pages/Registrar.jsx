@@ -57,7 +57,7 @@ function Registrar({ onLogout, user, showNotification }) {
         if (!user?._id) return;
         
         try {
-            const response = await fetch("http://localhost:3001/user/categories", {
+            const response = await fetch("https://autofin-backend.onrender.com/user/categories", {
                 headers: { 'X-User-ID': user._id }
             });
             if (!response.ok) throw new Error("Falha ao carregar categorias.");
@@ -102,7 +102,7 @@ function Registrar({ onLogout, user, showNotification }) {
 
     // 3. Sincroniza com o Backend
     try {
-        const response = await fetch("http://localhost:3001/user/categories", {
+        const response = await fetch("https://autofin-backend.onrender.com/user/categories", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-User-ID': user._id },
             body: JSON.stringify({ newCategory: newCategory })
@@ -160,7 +160,7 @@ function Registrar({ onLogout, user, showNotification }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/gasto", { 
+      const response = await fetch("https://autofin-backend.onrender.com/gasto", { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -209,7 +209,7 @@ function Registrar({ onLogout, user, showNotification }) {
       setLoadingFiltro(true);
       setErro('');
       
-      const url = `http://localhost:3001/gasto/filtrar?categoria=${encodeURIComponent(categoriaSelecionada)}`;
+      const url = `https://autofin-backend.onrender.com/gasto/filtrar?categoria=${encodeURIComponent(categoriaSelecionada)}`;
       
       try {
           const response = await fetch(url, {
@@ -252,7 +252,7 @@ function Registrar({ onLogout, user, showNotification }) {
             setLoadingFiltro(true);
             setErro('');
             try {
-                const response = await fetch(`http://localhost:3001/gasto/${gastoId}`, {
+                const response = await fetch(`https://autofin-backend.onrender.com/gasto/${gastoId}`, {
                     method: 'DELETE',
                     headers: { 'X-User-ID': user._id }
                 });

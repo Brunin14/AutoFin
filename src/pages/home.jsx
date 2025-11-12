@@ -106,8 +106,8 @@ function Home({ user, onLogout }) {
         try {
             const urlParams = `?startDate=${startDate}&endDate=${endDate}`;
             const [transacoesResponse, configResponse] = await Promise.all([
-                fetch(`http://localhost:3001/gasto/all${urlParams}`, { headers: { 'X-User-ID': userId } }),
-                fetch(`http://localhost:3001/user/${userId}/config`),
+                fetch(`https://autofin-backend.onrender.com/gasto/all${urlParams}`, { headers: { 'X-User-ID': userId } }),
+                fetch(`https://autofin-backend.onrender.com/user/${userId}/config`),
             ]);
             if (!transacoesResponse.ok) throw new Error('Falha ao carregar transações.');
             if (!configResponse.ok) throw new Error('Falha ao carregar configurações.');
