@@ -91,8 +91,8 @@ function Relatorio({ onLogout, user, showNotification }) {
         try {
             // Busca salário e rendas em paralelo
             const [salarioResponse, rendasResponse] = await Promise.all([
-                fetch(`http://localhost:3001/user/${user._id}/config`, { headers: { 'X-User-ID': user._id } }),
-                fetch(`http://localhost:3001/renda-fixa`, { headers: { 'X-User-ID': user._id } })
+                fetch(`https://autofin-backend.onrender.com/user/${user._id}/config`, { headers: { 'X-User-ID': user._id } }),
+                fetch(`https://autofin-backend.onrender.com/renda-fixa`, { headers: { 'X-User-ID': user._id } })
             ]);
 
             if (!salarioResponse.ok) throw new Error("Falha ao carregar configurações de salário.");
@@ -130,7 +130,7 @@ function Relatorio({ onLogout, user, showNotification }) {
       setLoadingGastos(true);
       try {
         const urlParams = `?startDate=${startDate}&endDate=${endDate}`;
-        const response = await fetch(`http://localhost:3001/gasto/relatorio-diario${urlParams}`, {
+        const response = await fetch(`https://autofin-backend.onrender.com/gasto/relatorio-diario${urlParams}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'X-User-ID': user._id },
         });
@@ -178,7 +178,7 @@ function Relatorio({ onLogout, user, showNotification }) {
     };
     
     try {
-        const response = await fetch(`http://localhost:3001/user/config`, {
+        const response = await fetch(`https://autofin-backend.onrender.com/user/config`, {
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(configPayload)
@@ -212,7 +212,7 @@ function Relatorio({ onLogout, user, showNotification }) {
 
       setLoadingRendas(true);
       try {
-          const response = await fetch('http://localhost:3001/renda-fixa', {
+          const response = await fetch('https://autofin-backend.onrender.com/renda-fixa', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'X-User-ID': user._id },
               body: JSON.stringify(payload)
@@ -240,7 +240,7 @@ function Relatorio({ onLogout, user, showNotification }) {
           async () => {
               setLoadingRendas(true);
               try {
-                  const response = await fetch(`http://localhost:3001/renda-fixa/${rendaId}`, {
+                  const response = await fetch(`https://autofin-backend.onrender.com/renda-fixa/${rendaId}`, {
                       method: 'DELETE',
                       headers: { 'X-User-ID': user._id }
                   });
@@ -267,7 +267,7 @@ function Relatorio({ onLogout, user, showNotification }) {
         async () => {
             setLoadingGastos(true);
             try {
-                const response = await fetch(`http://localhost:3001/gasto/${gastoId}`, {
+                const response = await fetch(`https://autofin-backend.onrender.com/gasto/${gastoId}`, {
                     method: 'DELETE',
                     headers: { 'X-User-ID': user._id },
                 });
