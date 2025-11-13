@@ -56,7 +56,6 @@ function Relatorio({ onLogout, user, showNotification }) {
   const [displaySalarioInteiro, setDisplaySalarioInteiro] = useState('');
   const [displaySalarioDia15, setDisplaySalarioDia15] = useState('');
   const [displaySalarioDia30, setDisplaySalarioDia30] = useState('');
-  // 🎯 'metaRecebimento' REMOVIDO
 
   // --- Estados do Relatório de Gastos ---
   const [gastosPorDia, setGastosPorDia] = useState([]);
@@ -116,7 +115,6 @@ function Relatorio({ onLogout, user, showNotification }) {
             setSalarioInteiro(salarioData.salarioInteiro);
             setSalarioDia15(salarioData.salarioDia15);
             setSalarioDia30(salarioData.salarioDia30);
-            // 🎯 'metaRecebimento' REMOVIDO
             
             setDisplaySalarioInteiro(salarioData.salarioInteiro > 0 ? formatCurrencyForDisplay(salarioData.salarioInteiro) : '');
             setDisplaySalarioDia15(salarioData.salarioDia15 > 0 ? formatCurrencyForDisplay(salarioData.salarioDia15) : '');
@@ -191,7 +189,6 @@ function Relatorio({ onLogout, user, showNotification }) {
         salarioInteiro: salarioInteiro,
         salarioDia15: salarioDia15,
         salarioDia30: salarioDia30,
-        // 🎯 'metaRecebimento' REMOVIDO
     };
     
     console.log("Debug: Salvando Salário...", configPayload);
@@ -348,8 +345,8 @@ function Relatorio({ onLogout, user, showNotification }) {
         {erro && <div className="erro-msg">{erro}</div>}
 
         {/* === 1. CARDS DE CONFIGURAÇÃO (TOPO) === */}
-        {/* 🎯 ATUALIZAÇÃO: Botão Salvar movido para dentro do card de Salário */}
-        <form className="config-wrapper">
+        {/* 🎯 CORREÇÃO: <form> trocado por <div> para evitar aninhamento */}
+        <div className="config-wrapper">
           
           {/* --- Card Salário --- */}
           <div className="card config-card">
@@ -422,13 +419,13 @@ function Relatorio({ onLogout, user, showNotification }) {
               </div>
             )}
             
-            {/* 🎯 ATUALIZAÇÃO: Botão Salvar agora é type="button" e fica aqui */}
+            {/* Botão para salvar salário (type="button" é importante) */}
             <button type="button" className="btn-save" disabled={loading} onClick={handleSaveConfig}>
               {loading ? "Salvando..." : "Salvar Salário"}
             </button>
           </div>
           
-          {/* 🎯 ATUALIZAÇÃO: Card de Renda Extra substituído */}
+          {/* --- Card Rendas Fixas --- */}
           <div className="card config-card">
             <h2>Rendas Fixas Recorrentes</h2>
             
@@ -453,7 +450,7 @@ function Relatorio({ onLogout, user, showNotification }) {
                 ))}
             </div>
 
-            {/* Formulário para adicionar nova renda */}
+            {/* Formulário para adicionar nova renda (este <form> está correto) */}
             <form className="renda-fixa-form" onSubmit={handleSaveRendaFixa}>
                 <input
                     type="text"
@@ -482,7 +479,8 @@ function Relatorio({ onLogout, user, showNotification }) {
             </form>
           </div>
           
-        </form>
+        </div>
+        {/* 🎯 CORREÇÃO: Fechamento da <div> */}
 
         {/* === 2. RELATÓRIO DE GASTOS (EMBAIXO) === */}
         <div className="card report-section">
