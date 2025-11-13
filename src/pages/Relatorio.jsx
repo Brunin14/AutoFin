@@ -427,13 +427,13 @@ function Relatorio({ onLogout, user, showNotification }) {
           
           {/* --- Card Rendas Fixas --- */}
           <div className="card config-card">
-            <h2>Rendas Fixas Recorrentes</h2>
+            <h2>Rendas Extras</h2>
             
             {/* Lista de Rendas Fixas */}
             <div className="renda-fixa-list">
                 {loadingRendas && <p>Carregando rendas...</p>}
                 {!loadingRendas && rendasFixas.length === 0 && (
-                    <p className="no-data-small">Nenhuma renda fixa cadastrada.</p>
+                    <p className="no-data-small">Nenhuma renda extra cadastrada.</p>
                 )}
                 {rendasFixas.map(renda => (
                     <div key={renda._id} className="renda-fixa-item">
@@ -452,31 +452,52 @@ function Relatorio({ onLogout, user, showNotification }) {
 
             {/* Formulário para adicionar nova renda (este <form> está correto) */}
             <form className="renda-fixa-form" onSubmit={handleSaveRendaFixa}>
-                <input
-                    type="text"
-                    placeholder="Nome da Renda (ex: Carros)"
-                    value={novaRendaForm.nome}
-                    onChange={(e) => setNovaRendaForm({...novaRendaForm, nome: e.target.value})}
-                />
-                <input
-                    type="text"
-                    placeholder="R$ 0,00"
-                    value={novaRendaForm.valorExibicao}
-                    onChange={(e) => {
-                      const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
-                      setNovaRendaForm({...novaRendaForm, valorPuro, valorExibicao});
-                    }}
-                />
-                <input
-                    type="number"
-                    min="1" max="31"
-                    value={novaRendaForm.diaRecebimento}
-                    onChange={(e) => setNovaRendaForm({...novaRendaForm, diaRecebimento: e.target.value})}
-                />
-                <button type="submit" className="btn-add-renda" disabled={loadingRendas}>
-                    +
-                </button>
-            </form>
+              
+              {/* 1. Nome da Renda */}
+              <div className="form-group renda-nome-group">
+                  <label htmlFor="rendaNome">Nome da Renda</label>
+                  <input
+                      id="rendaNome"
+                      type="text"
+                      placeholder="Ex: Carros"
+                      value={novaRendaForm.nome}
+                      onChange={(e) => setNovaRendaForm({...novaRendaForm, nome: e.target.value})}
+                  />
+              </div>
+
+              {/* 2. Valor */}
+              <div className="form-group renda-valor-group">
+                  <label htmlFor="rendaValor">Valor (R$)</label>
+                  <input
+                      id="rendaValor"
+                      type="text"
+                      placeholder="R$ 0,00"
+                      value={novaRendaForm.valorExibicao}
+                      onChange={(e) => {
+                        const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
+                        setNovaRendaForm({...novaRendaForm, valorPuro, valorExibicao});
+                      }}
+                  />
+              </div>
+
+              {/* 3. Dia do Mês */}
+              <div className="form-group renda-dia-group">
+                  <label htmlFor="rendaDia">Dia do Recebimento</label>
+                  <input
+                      id="rendaDia"
+                      type="number"
+                      min="1" max="31"
+                      placeholder="Ex: 5" 
+                      value={novaRendaForm.diaRecebimento}
+                      onChange={(e) => setNovaRendaForm({...novaRendaForm, diaRecebimento: e.target.value})}
+                  />
+              </div>
+              
+              {/* 4. Botão */}
+              <button type="submit" className="btn-add-renda" disabled={loadingRendas}>
+                  +
+              </button>
+          </form>
           </div>
           
         </div>

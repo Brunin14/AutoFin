@@ -130,11 +130,7 @@
 }
 
 /* --- Botão Salvar --- */
-.save-button-wrapper {
-    grid-column: span 2; 
-    text-align: center;
-}
-
+/* 🎯 ATUALIZAÇÃO: O wrapper foi removido, o botão está direto no card */
 .btn-save {
     background-color: #3b82f6; /* Azul */
     color: white;
@@ -145,7 +141,8 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 250px; 
+    width: 100%; /* Ocupa 100% do card */
+    margin-top: 10px; /* Espaço do último input */
     /* 🎯 NOVO: Sombra sutil */
     box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
 }
@@ -299,7 +296,7 @@
 @media (max-width: 900px) {
     .relatorio-container { padding: 20px 20px; }
     .config-wrapper { grid-template-columns: 1fr; }
-    .save-button-wrapper { grid-column: span 1; }
+    /* .save-button-wrapper { grid-column: span 1; } */ /* Não é mais necessário */
     .btn-save { width: 100%; }
 }
 
@@ -313,115 +310,277 @@
 }
 
 /* ==================================
-   NOVO: Filtro de Data
+   NOVO: Filtro de Data (JÁ EXISTIA)
 ===================================== */
-.date-filter-group {
+/* ... (seu código de filtro de data estava aqui, omitido por ser grande) ... */
+.date-picker-button {
     display: flex;
-    border-radius: 10px;
-    overflow: hidden; 
-    border: 1px solid var(--border-color);
-    margin-bottom: 25px;
-    max-width: 400px; /* Limita a largura */
-}
-
-.date-filter-option {
-    flex: 1; 
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    border-left: 1px solid var(--border-color);
-    
+    align-items: center;
+    gap: 8px;
     background-color: var(--card-bg);
-    color: #4b5563; 
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 1rem;
     font-weight: 500;
-    font-size: 0.95rem;
-    padding: 10px;
-}
-.date-filter-option:first-child {
-    border-left: none;
-}
-
-/* Efeito hover no botão não-selecionado */
-.date-filter-option:hover {
-    background-color: #f9fafb;
-}
-
-/* 🎯 ESTILO DO BOTÃO SELECIONADO */
-.date-filter-option.active {
+    color: var(--text-color-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .date-picker-button:hover {
+    border-color: var(--primary-color);
+  }
+  .date-picker-button span {
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  
+  /* O 'popup' que abre */
+  .date-picker-popover {
+    position: absolute;
+    z-index: 100;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+  }
+  
+  /* Ações dentro do popup */
+  .date-picker-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 15px;
+    border-top: 1px solid var(--border-color);
+  }
+  .date-picker-actions button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .btn-apply-date {
     background-color: var(--primary-color);
+    border-color: var(--primary-color);
     color: white;
-    font-weight: 700;
-}
+  }
+  .btn-apply-date:hover {
+    background-color: var(--secondary-color);
+  }
+  .btn-clear-date {
+    background-color: var(--card-bg);
+    color: var(--text-color-dark);
+  }
+  .btn-clear-date:hover {
+    background-color: #f9fafb;
+  }
 
 /* ==================================
-   NOVO: Estilos do Date Picker (Calendário)
+   🎯 CSS ADICIONADO PARA RENDAS FIXAS
 ===================================== */
 
-/* O botão que você clica */
-.date-picker-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px 15px;
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text-color-dark);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.date-picker-button:hover {
-  border-color: var(--primary-color);
-}
-.date-picker-button span {
-  font-weight: 600;
-  color: var(--primary-color);
+/* A lista de rendas cadastradas */
+.renda-fixa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    max-height: 180px; /* Limita a altura da lista */
+    overflow-y: auto;
+    padding-right: 5px; /* Espaço para a barra de rolagem */
 }
 
-/* O 'popup' que abre */
-.date-picker-popover {
-  position: absolute;
-  z-index: 100;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  margin-top: 8px;
+/* Aquele texto "Nenhuma renda..." */
+.no-data-small {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+    color: #6b7280;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
 }
 
-/* Ações dentro do popup */
-.date-picker-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 10px 15px;
-  border-top: 1px solid var(--border-color);
+/* Cada item da lista de rendas */
+.renda-fixa-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: #fdfdfd;
 }
-.date-picker-actions button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
+/* O nome da renda e o dia */
+.renda-fixa-item span:first-child {
+    font-weight: 500;
+    color: var(--text-color-dark);
+    font-size: 0.95rem;
 }
-.btn-apply-date {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-}
-.btn-apply-date:hover {
-  background-color: var(--secondary-color);
-}
-.btn-clear-date {
-  background-color: var(--card-bg);
-  color: var(--text-color-dark);
-}
-.btn-clear-date:hover {
-  background-color: #f9fafb;
+/* O valor da renda */
+.renda-fixa-item span:nth-child(2) {
+    font-weight: 600;
+    color: var(--primary-color); /* Verde para Renda */
+    font-size: 1rem;
 }
 
-/* Importa o CSS padrão da biblioteca de calendário */
-@import 'react-day-picker/dist/style.css';
+/* Botão de deletar da Renda Fixa (similar ao de gasto) */
+.btn-delete-fixo-renda {
+    background-color: #fef2f2; 
+    color: #b91c1c; 
+    border: 1px solid #fee2e2;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 2px;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Impede que o botão encolha */
+}
+.btn-delete-fixo-renda:hover {
+    background-color: #fee2e2;
+    transform: scale(1.1);
+}
+.btn-delete-fixo-renda:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* O formulário de adicionar nova renda */
+.renda-fixa-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    align-items: flex-start; /* Alinha os inputs no topo */
+}
+
+/* Inputs de texto no form de renda */
+.renda-fixa-form input[type="text"] {
+    flex: 3; /* Nome (maior) */
+}
+.renda-fixa-form input[type="text"]:nth-of-type(2) {
+     flex: 2; /* Valor (médio) */
+}
+
+/* Input de número (Dia) */
+.renda-fixa-form input[type="number"] {
+    flex: 1;
+    min-width: 65px; /* Largura mínima para "Dia" */
+    max-width: 80px; /* Largura máxima */
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    box-sizing: border-box; /* Importante! */
+    transition: all 0.2s ease;
+}
+.renda-fixa-form input[type="number"]:focus {
+     outline: none;
+     border-color: var(--primary-color);
+     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Botão de Adicionar Renda (+) */
+.btn-add-renda {
+    flex-shrink: 0; /* Impede que o botão encolha */
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    /* Faz o botão ter a mesma altura dos inputs */
+    width: 44px; 
+    height: 44px;
+    font-size: 1.8rem; /* Tamanho do "+" */
+    font-weight: 500;
+    line-height: 1;
+    padding-bottom: 4px; /* Ajuste fino do "+" */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-add-renda:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-1px);
+}
+.btn-add-renda:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Ajustes finos de responsividade para o novo form */
+@media (max-width: 600px) {
+    .renda-fixa-form {
+        flex-wrap: wrap; /* Deixa os itens quebrarem a linha */
+    }
+    .renda-fixa-form input[type="text"] {
+        flex-basis: 100%; /* Nome ocupa 100% */
+    }
+    .renda-fixa-form input[type="text"]:nth-of-type(2) {
+        flex-grow: 2; /* Valor cresce mais */
+    }
+    .renda-fixa-form input[type="number"] {
+        flex-grow: 1; /* Dia cresce menos */
+    }
+    .btn-add-renda {
+        height: 44px;
+        flex-grow: 1; /* Botão cresce para preencher */
+    }
+}
+
+/* O formulário de adicionar nova renda */
+.renda-fixa-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    
+    /* 🎯 MUDANÇA: Alinha os itens pela base (inputs e botão) */
+    align-items: flex-end; 
+}
+
+/* 🎯 NOVO: Define o tamanho dos grupos com label */
+.renda-nome-group {
+    flex: 3; /* Nome (maior) */
+}
+.renda-valor-group {
+    flex: 2; /* Valor (médio) */
+}
+.renda-dia-group {
+    flex: 1;
+    min-width: 80px; /* Largura mínima para "Dia" */
+}
+
+/* 🎯 MUDANÇA: Faz o input ocupar 100% do grupo */
+.renda-fixa-form .form-group {
+    margin-bottom: 0; /* Remove a margem padrão do .form-group */
+}
+.renda-fixa-form .form-group input {
+    width: 100%;
+    /* box-sizing: border-box; (Já deve estar no seu input global) */
+}
+
+/* 🎯 REMOVER: Essas regras antigas não são mais necessárias, 
+   pois o flex agora está nos grupos. Você pode apagá-las.
+*/
+/*
+.renda-fixa-form input[type="text"] {
+    flex: 3; 
+}
+.renda-fixa-form input[type="text"]:nth-of-type(2) {
+     flex: 2; 
+}
+.renda-fixa-form input[type="number"] {
+    flex: 1;
+}
+*/
