@@ -584,3 +584,67 @@
     flex: 1;
 }
 */
+
+/* ==================================
+   🎯 CSS ADICIONADO PARA FLUXO DE CAIXA
+===================================== */
+
+/* --- No Header do Dia --- */
+.dia-header {
+    /* Garante que os totais fiquem alinhados */
+    align-items: center; 
+}
+
+.dia-totais {
+    display: flex;
+    gap: 15px; /* Espaço entre Receita e Gasto */
+    align-items: center;
+}
+
+.dia-total-receita {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color); /* Verde */
+}
+.dia-total-gasto {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #b91c1c; /* Vermelho (como o antigo 'dia-total') */
+}
+
+/* Esconde o total antigo (substituído) */
+.dia-total {
+    display: none;
+}
+
+
+/* --- Nos Itens da Lista --- */
+
+/* Por padrão, o valor é vermelho (gasto) */
+.gasto-item.tipo-gasto .gasto-valor {
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+/* Se for receita, o valor fica verde */
+.gasto-item.tipo-receita .gasto-valor {
+    color: var(--primary-color); /* Verde */
+    font-weight: 600;
+}
+
+/* Opcional: Deixa o texto da receita levemente verde */
+.gasto-item.tipo-receita .gasto-desc {
+    color: #055a41;
+}
+
+/* Ajuste de responsividade para os totais */
+@media (max-width: 600px) {
+    .dia-header {
+        align-items: flex-start;
+    }
+    .dia-totais {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}

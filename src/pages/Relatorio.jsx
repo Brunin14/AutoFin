@@ -57,9 +57,10 @@ function Relatorio({ onLogout, user, showNotification }) {
   const [displaySalarioDia15, setDisplaySalarioDia15] = useState('');
   const [displaySalarioDia30, setDisplaySalarioDia30] = useState('');
 
-  // --- Estados do Relatório de Gastos ---
-  const [gastosPorDia, setGastosPorDia] = useState([]);
-  const [loadingGastos, setLoadingGastos] = useState(true);
+  // --- Estados do Relatório de Transações (Gastos e Receitas) ---
+  // 🎯 ATUALIZADO: Renomeado de 'gastosPorDia' para 'transacoesPorDia'
+  const [transacoesPorDia, setTransacoesPorDia] = useState([]);
+  const [loadingTransacoes, setLoadingTransacoes] = useState(true);
   
   // 🎯 NOVOS ESTADOS: Rendas Fixas
   const [rendasFixas, setRendasFixas] = useState([]);
@@ -92,6 +93,10 @@ function Relatorio({ onLogout, user, showNotification }) {
   useEffect(() => {
     const carregarConfiguracoes = async () => {
         if (!user?._id) return;
+        
+        // 🎯 ADICIONADO PARA DEBUG
+        console.log("ID DO USUÁRIO LOGADO:", user._id); 
+        
         setLoading(true);
         setLoadingRendas(true);
         console.log("Debug: Buscando configurações (Salário e Rendas)...");
@@ -134,12 +139,15 @@ function Relatorio({ onLogout, user, showNotification }) {
     carregarConfiguracoes();
   }, [user]);
   
-  // 2. CARREGA O RELATÓRIO DE GASTOS (com filtro)
+  // 2. 🎯 ATUALIZADO: CARREGA O RELATÓRIO DE TRANSAÇÕES
   useEffect(() => {
     const carregarGastos = async () => {
       if (!user?._id) return;
-      setLoadingGastos(true);
-      console.log(`Debug: Buscando gastos de ${startDate} a ${endDate}`);
+      
+      // 🎯 RENOMEADO
+      setLoadingTransacoes(true); 
+      
+      console.log(`Debug: Buscando transações de ${startDate} a ${endDate}`);
       try {
         const urlParams = `?startDate=${startDate}&endDate=${endDate}`;
         const response = await fetch(`${API_URL}/gasto/relatorio-diario${urlParams}`, {
@@ -148,13 +156,18 @@ function Relatorio({ onLogout, user, showNotification }) {
         });
         if (!response.ok) throw new Error("Falha ao carregar relatório de gastos.");
         const data = await response.json();
-        console.log("Debug: Gastos diários recebidos:", data);
-        setGastosPorDia(data);
+        
+        // 🎯 ATUALIZADO
+        console.log("Debug: Transações diárias recebidas:", data);
+        setTransacoesPorDia(data); // RENOMEADO
+        
       } catch (err) {
         console.error("Debug Erro [carregarGastos]:", err);
         setErro("Erro ao carregar seu histórico de gastos.");
       } finally {
-        setLoadingGastos(false);
+        
+        // 🎯 RENOMEADO
+        setLoadingTransacoes(false); 
       }
     };
     carregarGastos();
@@ -211,7 +224,7 @@ function Relatorio({ onLogout, user, showNotification }) {
     }
   };
 
-  // 4. 🎯 NOVA FUNÇÃO: SALVAR a nova RENDA FIXA
+  // 4. SALVAR a nova RENDA FIXA
   const handleSaveRendaFixa = async (e) => {
       e.preventDefault();
       setErro('');
@@ -251,7 +264,7 @@ function Relatorio({ onLogout, user, showNotification }) {
       }
   };
 
-  // 5. 🎯 NOVA FUNÇÃO: DELETAR RENDA FIXA
+  // 5. DELETAR RENDA FIXA
   const handleDeleteRendaFixa = (rendaId) => {
       if (!user?._id) return;
       
@@ -259,7 +272,7 @@ function Relatorio({ onLogout, user, showNotification }) {
       showNotification(
           "Tem certeza que quer deletar esta renda?",
           "confirm",
-          async () => { // O que fazer se o usuário clicar "Sim"
+          async () => { 
               console.log("Debug: Confirmado, deletando Renda ID:", rendaId);
               setLoadingRendas(true);
               try {
@@ -283,16 +296,19 @@ function Relatorio({ onLogout, user, showNotification }) {
       );
   };
   
-  // 6. DELETAR GASTO (da lista)
+  // 6. 🎯 ATUALIZADO: DELETAR TRANSAÇÃO (Gasto ou Receita)
   const handleDeleteExpense = (gastoId) => {
       if (!user?._id) return;
-      console.log("Debug: Solicitando confirmação para deletar Gasto ID:", gastoId);
+      console.log("Debug: Solicitando confirmação para deletar Transação ID:", gastoId);
       showNotification(
-        "Tem certeza que deseja excluir este gasto?",
+        "Tem certeza que deseja excluir esta transação?", // Atualizado
         "confirm",
         async () => {
-            console.log("Debug: Confirmado, deletando Gasto ID:", gastoId);
-            setLoadingGastos(true);
+            console.log("Debug: Confirmado, deletando Transação ID:", gastoId);
+            
+            // 🎯 RENOMEADO
+            setLoadingTransacoes(true); 
+            
             try {
                 const response = await fetch(`${API_URL}/gasto/${gastoId}`, {
                     method: 'DELETE',
@@ -301,23 +317,50 @@ function Relatorio({ onLogout, user, showNotification }) {
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.message || "Falha ao deletar.");
 
-                showNotification("Gasto deletado!", "success");
-                console.log("Debug: Gasto deletado com sucesso.");
-                setGastosPorDia(prevGrupos => {
+                showNotification("Transação deletada!", "success"); // Atualizado
+                console.log("Debug: Transação deletada com sucesso.");
+                
+                // 🎯 LÓGICA DE ATUALIZAÇÃO SUBSTITUÍDA
+                setTransacoesPorDia(prevGrupos => { // RENOMEADO
                     const novosGrupos = prevGrupos.map(grupo => {
-                        const gastoOriginal = grupo.gastos.find(g => g._id === gastoId);
-                        if (!gastoOriginal) return grupo; 
-                        const novosGastos = grupo.gastos.filter(g => g._id !== gastoId);
-                        const novoTotalDia = grupo.totalDia - gastoOriginal.valor;
-                        return { ...grupo, gastos: novosGastos, totalDia: novoTotalDia };
+                        // Encontra a transação original (pode ser gasto ou receita)
+                        const transacaoOriginal = grupo.transacoes.find(t => t._id === gastoId);
+                        
+                        // Se não achar, retorna o grupo original
+                        if (!transacaoOriginal) return grupo; 
+                        
+                        // Filtra a transação da lista
+                        const novasTransacoes = grupo.transacoes.filter(t => t._id !== gastoId);
+                        
+                        // Subtrai o valor do total correto
+                        let novoTotalGasto = grupo.totalGasto;
+                        let novoTotalReceita = grupo.totalReceita;
+                        
+                        if (transacaoOriginal.tipo === 'expense') {
+                            novoTotalGasto -= transacaoOriginal.valor;
+                        } else if (transacaoOriginal.tipo === 'income') {
+                            novoTotalReceita -= transacaoOriginal.valor;
+                        }
+
+                        // Retorna o grupo atualizado
+                        return { 
+                            ...grupo, 
+                            transacoes: novasTransacoes, 
+                            totalGasto: novoTotalGasto, 
+                            totalReceita: novoTotalReceita
+                        };
                     });
-                    return novosGrupos.filter(grupo => grupo.gastos.length > 0);
+                    
+                    // Filtra grupos que ficaram vazios
+                    return novosGrupos.filter(grupo => grupo.transacoes.length > 0);
                 });
+                
             } catch (err) {
                 console.error("Debug Erro [handleDeleteExpense]:", err);
                 showNotification(err.message, "error");
             } finally {
-                setLoadingGastos(false);
+                // 🎯 RENOMEADO
+                setLoadingTransacoes(false);
             }
         }
       );
@@ -345,7 +388,6 @@ function Relatorio({ onLogout, user, showNotification }) {
         {erro && <div className="erro-msg">{erro}</div>}
 
         {/* === 1. CARDS DE CONFIGURAÇÃO (TOPO) === */}
-        {/* 🎯 CORREÇÃO: <form> trocado por <div> para evitar aninhamento */}
         <div className="config-wrapper">
           
           {/* --- Card Salário --- */}
@@ -419,7 +461,6 @@ function Relatorio({ onLogout, user, showNotification }) {
               </div>
             )}
             
-            {/* Botão para salvar salário (type="button" é importante) */}
             <button type="button" className="btn-save" disabled={loading} onClick={handleSaveConfig}>
               {loading ? "Salvando..." : "Salvar Salário"}
             </button>
@@ -427,13 +468,12 @@ function Relatorio({ onLogout, user, showNotification }) {
           
           {/* --- Card Rendas Fixas --- */}
           <div className="card config-card">
-            <h2>Rendas Extras</h2>
+            <h2>Rendas Fixas Recorrentes</h2>
             
-            {/* Lista de Rendas Fixas */}
             <div className="renda-fixa-list">
                 {loadingRendas && <p>Carregando rendas...</p>}
                 {!loadingRendas && rendasFixas.length === 0 && (
-                    <p className="no-data-small">Nenhuma renda extra cadastrada.</p>
+                    <p className="no-data-small">Nenhuma renda fixa cadastrada.</p>
                 )}
                 {rendasFixas.map(renda => (
                     <div key={renda._id} className="renda-fixa-item">
@@ -450,62 +490,61 @@ function Relatorio({ onLogout, user, showNotification }) {
                 ))}
             </div>
 
-            {/* Formulário para adicionar nova renda (este <form> está correto) */}
+            {/* 🎯 ATUALIZADO: Formulário com Labels */}
             <form className="renda-fixa-form" onSubmit={handleSaveRendaFixa}>
-              
-              {/* 1. Nome da Renda */}
-              <div className="form-group renda-nome-group">
-                  <label htmlFor="rendaNome">Nome da Renda</label>
-                  <input
-                      id="rendaNome"
-                      type="text"
-                      placeholder="Ex: Carros"
-                      value={novaRendaForm.nome}
-                      onChange={(e) => setNovaRendaForm({...novaRendaForm, nome: e.target.value})}
-                  />
-              </div>
+                          
+                {/* 1. Nome da Renda */}
+                <div className="form-group renda-nome-group">
+                    <label htmlFor="rendaNome">Nome da Renda</label>
+                    <input
+                        id="rendaNome"
+                        type="text"
+                        placeholder="Ex: Carros"
+                        value={novaRendaForm.nome}
+                        onChange={(e) => setNovaRendaForm({...novaRendaForm, nome: e.target.value})}
+                    />
+                </div>
 
-              {/* 2. Valor */}
-              <div className="form-group renda-valor-group">
-                  <label htmlFor="rendaValor">Valor (R$)</label>
-                  <input
-                      id="rendaValor"
-                      type="text"
-                      placeholder="R$ 0,00"
-                      value={novaRendaForm.valorExibicao}
-                      onChange={(e) => {
-                        const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
-                        setNovaRendaForm({...novaRendaForm, valorPuro, valorExibicao});
-                      }}
-                  />
-              </div>
+                {/* 2. Valor */}
+                <div className="form-group renda-valor-group">
+                    <label htmlFor="rendaValor">Valor (R$)</label>
+                    <input
+                        id="rendaValor"
+                        type="text"
+                        placeholder="R$ 0,00"
+                        value={novaRendaForm.valorExibicao}
+                        onChange={(e) => {
+                          const { valorPuro, valorExibicao } = getCurrencyValues(e.target.value);
+                          setNovaRendaForm({...novaRendaForm, valorPuro, valorExibicao});
+                        }}
+                    />
+                </div>
 
-              {/* 3. Dia do Mês */}
-              <div className="form-group renda-dia-group">
-                  <label htmlFor="rendaDia">Dia do Recebimento</label>
-                  <input
-                      id="rendaDia"
-                      type="number"
-                      min="1" max="31"
-                      placeholder="Ex: 5" 
-                      value={novaRendaForm.diaRecebimento}
-                      onChange={(e) => setNovaRendaForm({...novaRendaForm, diaRecebimento: e.target.value})}
-                  />
-              </div>
-              
-              {/* 4. Botão */}
-              <button type="submit" className="btn-add-renda" disabled={loadingRendas}>
-                  +
-              </button>
-          </form>
+                {/* 3. Dia do Mês */}
+                <div className="form-group renda-dia-group">
+                    <label htmlFor="rendaDia">Dia</label>
+                    <input
+                        id="rendaDia"
+                        type="number"
+                        min="1" max="31"
+                        placeholder="Ex: 5"
+                        value={novaRendaForm.diaRecebimento}
+                        onChange={(e) => setNovaRendaForm({...novaRendaForm, diaRecebimento: e.target.value})}
+                    />
+                </div>
+                
+                {/* 4. Botão */}
+                <button type="submit" className="btn-add-renda" disabled={loadingRendas}>
+                    +
+                </button>
+            </form>
           </div>
           
         </div>
-        {/* 🎯 CORREÇÃO: Fechamento da <div> */}
 
-        {/* === 2. RELATÓRIO DE GASTOS (EMBAIXO) === */}
+        {/* === 2. 🎯 ATUALIZADO: RELATÓRIO DE TRANSAÇÕES === */}
         <div className="card report-section">
-          <h2>Histórico de Gastos</h2>
+          <h2>Histórico de Transações</h2>
           
           {/* Botão do Calendário */}
           <div style={{ position: 'relative' }} ref={datePickerRef}>
@@ -549,41 +588,58 @@ function Relatorio({ onLogout, user, showNotification }) {
           </div>
           
           
-          {loadingGastos ? (
+          {/* 🎯 ATUALIZADO PARA USAR OS NOVOS ESTADOS */}
+          {loadingTransacoes ? (
             <p className="loading-data">Carregando histórico...</p>
-          ) : gastosPorDia.length === 0 ? (
-            <p className="no-data">Nenhum gasto registrado neste período.</p>
+          ) : transacoesPorDia.length === 0 ? (
+            <p className="no-data">Nenhuma transação registrada neste período.</p>
           ) : (
             <div className="report-list">
-              {gastosPorDia.map(grupo => (
+              
+              {/* 🎯 RENOMEADO */}
+              {transacoesPorDia.map(grupo => (
                 <div key={grupo.data} className="dia-grupo">
                   
                   <div className="dia-header">
                     <span className="dia-data">
                       {new Date(grupo.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', timeZone: 'UTC' })}
                     </span>
-                    <span className="dia-total">
-                      Total: {formatCurrencyForDisplay(grupo.totalDia)}
-                    </span>
+                    
+                    {/* 🎯 ATUALIZADO: Mostra Receita e Gasto */}
+                    <div className="dia-totais">
+                        <span className="dia-total-receita">
+                           + {formatCurrencyForDisplay(grupo.totalReceita)}
+                        </span>
+                        <span className="dia-total-gasto">
+                           - {formatCurrencyForDisplay(grupo.totalGasto)}
+                        </span>
+                    </div>
+                    
                   </div>
                   
+                  {/* 🎯 ATUALIZADO */}
                   <ul className="gasto-lista">
-                    {grupo.gastos.map(gasto => (
-                      <li key={gasto._id} className="gasto-item">
+                    {grupo.transacoes.map(transacao => (
+                      <li 
+                        key={transacao._id} 
+                        // CLASSE DINÂMICA
+                        className={`gasto-item ${transacao.tipo === 'income' ? 'tipo-receita' : 'tipo-gasto'}`}
+                      >
                         <span className="gasto-desc">
-                            <strong className="gasto-cat-tag">[{gasto.categoria}]</strong>
-                            {gasto.descricao}
+                            <strong className="gasto-cat-tag">[{transacao.categoria}]</strong>
+                            {transacao.descricao}
                         </span>
                         
                         <div className="gasto-item-right">
+                          {/* VALOR DINÂMICO com +/- */}
                           <span className="gasto-valor">
-                              {formatCurrencyForDisplay(gasto.valor)}
+                              {transacao.tipo === 'income' ? '+' : '-'} {formatCurrencyForDisplay(transacao.valor)}
                           </span>
                           
                           <button
                             className="btn-delete-gasto-relatorio"
-                            title="Excluir gasto"
-                            onClick={() => handleDeleteExpense(gasto._id)}
+                            title="Excluir transação"
+                            onClick={() => handleDeleteExpense(transacao._id)}
                           >
                             &times;
                           </button>
