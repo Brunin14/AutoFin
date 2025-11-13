@@ -66,7 +66,7 @@ function App() {
 
   /**
    * Componente auxiliar para proteger rotas.
-   * 6. ATUALIZADO: Agora passa a prop 'showNotification'
+   * 6. 🎯 A CORREÇÃO ESTÁ AQUI 🎯
    */
   const ProtectedRoute = ({ element: Component, ...rest }) => {
     return user ? (
@@ -74,7 +74,7 @@ function App() {
         {...rest} 
         user={user} 
         onLogout={handleLogout}
-        showNotification={showNotification} // <-- AQUI ESTÁ A CORREÇÃO
+        showNotification={showNotification} // <-- Passa a função para a página
       />
     ) : (
       <Navigate to="/" replace />
@@ -96,6 +96,7 @@ function App() {
             user ? (
               <Navigate to="/home" replace />
             ) : (
+              // Passa o showNotification também para o Login/Cadastro
               <LoginPage onLogin={handleLogin} showNotification={showNotification} />
             )
           }
