@@ -6,6 +6,12 @@ import 'react-day-picker/dist/style.css';
 import { ptBR } from 'date-fns/locale';
 
 // ======================================================================
+// 🎯 URL Centralizada do Backend
+// ======================================================================
+const API_URL = "https://autofin-backend.onrender.com";
+// ======================================================================
+
+// ======================================================================
 // FUNÇÕES AUXILIARES DE MOEDA E DATA
 // ======================================================================
 const formatCurrencyForDisplay = (value) => {
@@ -50,19 +56,20 @@ function Relatorio({ onLogout, user, showNotification }) {
   const [displaySalarioInteiro, setDisplaySalarioInteiro] = useState('');
   const [displaySalarioDia15, setDisplaySalarioDia15] = useState('');
   const [displaySalarioDia30, setDisplaySalarioDia30] = useState('');
+  // 🎯 'metaRecebimento' REMOVIDO
 
   // --- Estados do Relatório de Gastos ---
   const [gastosPorDia, setGastosPorDia] = useState([]);
   const [loadingGastos, setLoadingGastos] = useState(true);
   
-  // --- Estados das Rendas Fixas ---
+  // 🎯 NOVOS ESTADOS: Rendas Fixas
   const [rendasFixas, setRendasFixas] = useState([]);
   const [loadingRendas, setLoadingRendas] = useState(true);
   const [novaRendaForm, setNovaRendaForm] = useState({
       nome: '',
       valorPuro: 0,
       valorExibicao: '',
-      diaRecebimento: 1,
+      diaRecebimento: 1, // Padrão dia 1
   });
 
   // --- Estados do Filtro de Data ---
@@ -88,11 +95,11 @@ function Relatorio({ onLogout, user, showNotification }) {
         if (!user?._id) return;
         setLoading(true);
         setLoadingRendas(true);
+        console.log("Debug: Buscando configurações (Salário e Rendas)...");
         try {
-            // Busca salário e rendas em paralelo
             const [salarioResponse, rendasResponse] = await Promise.all([
-                fetch(`https://autofin-backend.onrender.com/user/${user._id}/config`, { headers: { 'X-User-ID': user._id } }),
-                fetch(`https://autofin-backend.onrender.com/renda-fixa`, { headers: { 'X-User-ID': user._id } })
+                fetch(`${API_URL}/user/${user._id}/config`, { headers: { 'X-User-ID': user._id } }),
+                fetch(`${API_URL}/renda-fixa`, { headers: { 'X-User-ID': user._id } })
             ]);
 
             if (!salarioResponse.ok) throw new Error("Falha ao carregar configurações de salário.");
@@ -101,11 +108,16 @@ function Relatorio({ onLogout, user, showNotification }) {
             const salarioData = await salarioResponse.json();
             const rendasData = await rendasResponse.json();
             
+            console.log("Debug: Salários recebidos:", salarioData);
+            console.log("Debug: Rendas recebidas:", rendasData);
+
             // Popula Salário
             setSalarioTipo(salarioData.salarioTipo);
             setSalarioInteiro(salarioData.salarioInteiro);
             setSalarioDia15(salarioData.salarioDia15);
             setSalarioDia30(salarioData.salarioDia30);
+            // 🎯 'metaRecebimento' REMOVIDO
+            
             setDisplaySalarioInteiro(salarioData.salarioInteiro > 0 ? formatCurrencyForDisplay(salarioData.salarioInteiro) : '');
             setDisplaySalarioDia15(salarioData.salarioDia15 > 0 ? formatCurrencyForDisplay(salarioData.salarioDia15) : '');
             setDisplaySalarioDia30(salarioData.salarioDia30 > 0 ? formatCurrencyForDisplay(salarioData.salarioDia30) : '');
@@ -114,6 +126,7 @@ function Relatorio({ onLogout, user, showNotification }) {
             setRendasFixas(rendasData);
 
         } catch (err) {
+            console.error("Debug Erro [carregarConfiguracoes]:", err);
             setErro("Erro ao carregar suas configurações: " + err.message);
         } finally {
             setLoading(false);
@@ -128,16 +141,19 @@ function Relatorio({ onLogout, user, showNotification }) {
     const carregarGastos = async () => {
       if (!user?._id) return;
       setLoadingGastos(true);
+      console.log(`Debug: Buscando gastos de ${startDate} a ${endDate}`);
       try {
         const urlParams = `?startDate=${startDate}&endDate=${endDate}`;
-        const response = await fetch(`https://autofin-backend.onrender.com/gasto/relatorio-diario${urlParams}`, {
+        const response = await fetch(`${API_URL}/gasto/relatorio-diario${urlParams}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'X-User-ID': user._id },
         });
         if (!response.ok) throw new Error("Falha ao carregar relatório de gastos.");
         const data = await response.json();
+        console.log("Debug: Gastos diários recebidos:", data);
         setGastosPorDia(data);
       } catch (err) {
+        console.error("Debug Erro [carregarGastos]:", err);
         setErro("Erro ao carregar seu histórico de gastos.");
       } finally {
         setLoadingGastos(false);
@@ -146,7 +162,7 @@ function Relatorio({ onLogout, user, showNotification }) {
     carregarGastos();
   }, [user, startDate, endDate]);
 
-  // Efeito para fechar o calendário ao clicar fora
+  // Efeito para fechar o calendário
   useEffect(() => {
     const handleClickOutside = (event) => {
         if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
@@ -158,7 +174,7 @@ function Relatorio({ onLogout, user, showNotification }) {
   }, [datePickerRef]);
 
 
-  // 3. FUNÇÃO PARA SALVAR as configurações de SALÁRIO
+  // 3. SALVAR configurações de SALÁRIO
   const handleSaveConfig = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -175,10 +191,12 @@ function Relatorio({ onLogout, user, showNotification }) {
         salarioInteiro: salarioInteiro,
         salarioDia15: salarioDia15,
         salarioDia30: salarioDia30,
+        // 🎯 'metaRecebimento' REMOVIDO
     };
     
+    console.log("Debug: Salvando Salário...", configPayload);
     try {
-        const response = await fetch(`https://autofin-backend.onrender.com/user/config`, {
+        const response = await fetch(`${API_URL}/user/config`, {
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(configPayload)
@@ -186,15 +204,17 @@ function Relatorio({ onLogout, user, showNotification }) {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Erro do servidor");
         
+        console.log("Debug: Salário salvo com sucesso.");
         showNotification("Salário salvo com sucesso!", "success");
     } catch (err) {
+        console.error("Debug Erro [handleSaveConfig]:", err);
         showNotification(err.message || "Erro ao salvar salário.", "error");
     } finally {
         setLoading(false);
     }
   };
 
-  // 4. FUNÇÃO PARA SALVAR a nova RENDA FIXA
+  // 4. 🎯 NOVA FUNÇÃO: SALVAR a nova RENDA FIXA
   const handleSaveRendaFixa = async (e) => {
       e.preventDefault();
       setErro('');
@@ -204,15 +224,16 @@ function Relatorio({ onLogout, user, showNotification }) {
       }
 
       const payload = {
-          userId: user._id,
           nome: novaRendaForm.nome.trim(),
           valor: novaRendaForm.valorPuro,
           diaRecebimento: novaRendaForm.diaRecebimento,
       };
-
+      
+      console.log("Debug: Salvando Renda Fixa...", payload);
       setLoadingRendas(true);
+      
       try {
-          const response = await fetch('https://autofin-backend.onrender.com/renda-fixa', {
+          const response = await fetch(`${API_URL}/renda-fixa`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'X-User-ID': user._id },
               body: JSON.stringify(payload)
@@ -220,27 +241,32 @@ function Relatorio({ onLogout, user, showNotification }) {
           const data = await response.json();
           if (!response.ok) throw new Error(data.message || "Erro ao salvar.");
 
+          console.log("Debug: Renda Fixa salva:", data.rendaFixa);
           setRendasFixas([...rendasFixas, data.rendaFixa]);
           setNovaRendaForm({ nome: '', valorPuro: 0, valorExibicao: '', diaRecebimento: 1 });
           showNotification("Renda fixa salva!", "success");
 
       } catch (err) {
+          console.error("Debug Erro [handleSaveRendaFixa]:", err);
           showNotification(err.message, "error");
       } finally {
           setLoadingRendas(false);
       }
   };
 
-  // 5. FUNÇÃO PARA DELETAR RENDA FIXA
+  // 5. 🎯 NOVA FUNÇÃO: DELETAR RENDA FIXA
   const handleDeleteRendaFixa = (rendaId) => {
       if (!user?._id) return;
+      
+      console.log("Debug: Solicitando confirmação para deletar Renda ID:", rendaId);
       showNotification(
           "Tem certeza que quer deletar esta renda?",
           "confirm",
-          async () => {
+          async () => { // O que fazer se o usuário clicar "Sim"
+              console.log("Debug: Confirmado, deletando Renda ID:", rendaId);
               setLoadingRendas(true);
               try {
-                  const response = await fetch(`https://autofin-backend.onrender.com/renda-fixa/${rendaId}`, {
+                  const response = await fetch(`${API_URL}/renda-fixa/${rendaId}`, {
                       method: 'DELETE',
                       headers: { 'X-User-ID': user._id }
                   });
@@ -249,7 +275,9 @@ function Relatorio({ onLogout, user, showNotification }) {
 
                   setRendasFixas(rendasFixas.filter(r => r._id !== rendaId));
                   showNotification("Renda deletada.", "success");
+                  console.log("Debug: Renda deletada com sucesso.");
               } catch (err) {
+                  console.error("Debug Erro [handleDeleteRendaFixa]:", err);
                   showNotification(err.message, "error");
               } finally {
                   setLoadingRendas(false);
@@ -258,16 +286,18 @@ function Relatorio({ onLogout, user, showNotification }) {
       );
   };
   
-  // 6. FUNÇÃO PARA DELETAR GASTO (da lista)
+  // 6. DELETAR GASTO (da lista)
   const handleDeleteExpense = (gastoId) => {
       if (!user?._id) return;
+      console.log("Debug: Solicitando confirmação para deletar Gasto ID:", gastoId);
       showNotification(
         "Tem certeza que deseja excluir este gasto?",
         "confirm",
         async () => {
+            console.log("Debug: Confirmado, deletando Gasto ID:", gastoId);
             setLoadingGastos(true);
             try {
-                const response = await fetch(`https://autofin-backend.onrender.com/gasto/${gastoId}`, {
+                const response = await fetch(`${API_URL}/gasto/${gastoId}`, {
                     method: 'DELETE',
                     headers: { 'X-User-ID': user._id },
                 });
@@ -275,6 +305,7 @@ function Relatorio({ onLogout, user, showNotification }) {
                 if (!response.ok) throw new Error(data.message || "Falha ao deletar.");
 
                 showNotification("Gasto deletado!", "success");
+                console.log("Debug: Gasto deletado com sucesso.");
                 setGastosPorDia(prevGrupos => {
                     const novosGrupos = prevGrupos.map(grupo => {
                         const gastoOriginal = grupo.gastos.find(g => g._id === gastoId);
@@ -286,6 +317,7 @@ function Relatorio({ onLogout, user, showNotification }) {
                     return novosGrupos.filter(grupo => grupo.gastos.length > 0);
                 });
             } catch (err) {
+                console.error("Debug Erro [handleDeleteExpense]:", err);
                 showNotification(err.message, "error");
             } finally {
                 setLoadingGastos(false);
@@ -297,6 +329,7 @@ function Relatorio({ onLogout, user, showNotification }) {
   // Funções para controlar o calendário
   const handleApplyDateRange = () => {
       if (selectedRange.from && selectedRange.to) {
+          console.log("Debug: Aplicando novo range de data");
           setStartDate(toISO_YYYY_MM_DD(selectedRange.from));
           setEndDate(toISO_YYYY_MM_DD(selectedRange.to));
           setShowDatePicker(false);
@@ -315,7 +348,8 @@ function Relatorio({ onLogout, user, showNotification }) {
         {erro && <div className="erro-msg">{erro}</div>}
 
         {/* === 1. CARDS DE CONFIGURAÇÃO (TOPO) === */}
-        <form className="config-wrapper" onSubmit={handleSaveConfig}>
+        {/* 🎯 ATUALIZAÇÃO: Botão Salvar movido para dentro do card de Salário */}
+        <form className="config-wrapper">
           
           {/* --- Card Salário --- */}
           <div className="card config-card">
@@ -344,7 +378,6 @@ function Relatorio({ onLogout, user, showNotification }) {
               </label>
             </div>
 
-            {/* Inputs Condicionais (Corrigido) */}
             {salarioTipo === 'inteiro' && (
               <div className="form-group">
                 <label htmlFor="salarioInteiro">Valor Total (R$)</label>
@@ -389,13 +422,13 @@ function Relatorio({ onLogout, user, showNotification }) {
               </div>
             )}
             
-            {/* Botão de Salvar Salário */}
-            <button type="submit" className="btn-save" disabled={loading}>
+            {/* 🎯 ATUALIZAÇÃO: Botão Salvar agora é type="button" e fica aqui */}
+            <button type="button" className="btn-save" disabled={loading} onClick={handleSaveConfig}>
               {loading ? "Salvando..." : "Salvar Salário"}
             </button>
           </div>
           
-          {/* --- Card Rendas Fixas (Novo) --- */}
+          {/* 🎯 ATUALIZAÇÃO: Card de Renda Extra substituído */}
           <div className="card config-card">
             <h2>Rendas Fixas Recorrentes</h2>
             
@@ -412,6 +445,7 @@ function Relatorio({ onLogout, user, showNotification }) {
                         <button 
                             className="btn-delete-fixo-renda" 
                             onClick={() => handleDeleteRendaFixa(renda._id)}
+                            disabled={loadingRendas}
                         >
                             &times;
                         </button>
@@ -550,11 +584,5 @@ function Relatorio({ onLogout, user, showNotification }) {
     </>
   );
 }
-
-// (Funções auxiliares restantes)
-const carregarConfiguracoes = async () => {};
-const carregarGastos = async () => {};
-const handleSaveConfig = async () => {};
-const handleDeleteExpense = async () => {};
 
 export default Relatorio;
