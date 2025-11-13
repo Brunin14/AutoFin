@@ -9,7 +9,7 @@ import Relatorio from "./pages/Relatorio";
 import GastosFixos from "./pages/GastosFixos";
 import Registrar from "./pages/Registrar";
 
-// 2. 🎯 Importa o popup
+// 2. Importa o popup
 import NotificationPopup from "./components/NotificationPopup";
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
     }
   });
 
-  // 3. 🎯 Estado para o popup
+  // 3. Estado para o popup
   const [notification, setNotification] = useState({
     isOpen: false,
     message: '',
@@ -33,7 +33,7 @@ function App() {
     onConfirm: null,
   });
 
-  // 4. 🎯 Função para MOSTRAR o popup
+  // 4. Função para MOSTRAR o popup
   const showNotification = (message, type = 'success', onConfirm = null) => {
     setNotification({
       isOpen: true,
@@ -43,7 +43,7 @@ function App() {
     });
   };
 
-  // 5. 🎯 Função para FECHAR o popup
+  // 5. Função para FECHAR o popup
   const closeNotification = () => {
     setNotification({
       isOpen: false,
@@ -66,7 +66,7 @@ function App() {
 
   /**
    * Componente auxiliar para proteger rotas.
-   * 6. 🎯 ATUALIZADO: Agora passa a prop 'showNotification'
+   * 6. ATUALIZADO: Agora passa a prop 'showNotification'
    */
   const ProtectedRoute = ({ element: Component, ...rest }) => {
     return user ? (
@@ -74,7 +74,7 @@ function App() {
         {...rest} 
         user={user} 
         onLogout={handleLogout}
-        showNotification={showNotification} // Passa a função para a página
+        showNotification={showNotification} // <-- AQUI ESTÁ A CORREÇÃO
       />
     ) : (
       <Navigate to="/" replace />
@@ -84,7 +84,7 @@ function App() {
   return (
     <Router>
       
-      {/* 7. 🎯 Renderiza o popup (ele fica invisível até ser ativado) */}
+      {/* 7. Renderiza o popup (ele fica invisível até ser ativado) */}
       <NotificationPopup config={notification} onClose={closeNotification} />
 
       <Routes>
@@ -96,7 +96,6 @@ function App() {
             user ? (
               <Navigate to="/home" replace />
             ) : (
-              // 8. 🎯 ATUALIZADO: Passa 'showNotification'
               <LoginPage onLogin={handleLogin} showNotification={showNotification} />
             )
           }
@@ -109,7 +108,6 @@ function App() {
             user ? (
               <Navigate to="/home" replace /> 
             ) : (
-              // 8. 🎯 ATUALIZADO: Passa 'showNotification'
               <CadastroPage onLogin={handleLogin} showNotification={showNotification} />
             )
           }
